@@ -13,7 +13,7 @@ local xuui = require 'xuui'
 local select_info = {'vegetables', 'meat'}
 
 local mvvm = xuui.new {
-   el = select(1, ...), -- 从参数传过来，或者直接CS.UnityEngine.GameObject.Find('Canvas')也可以
+   el = select(1, ...), -- 从参数传过来，或者类似CS.UnityEngine.GameObject.Find('Canvas')主动获取也可以
    data = {
        name = 'john',
        select = 0,
