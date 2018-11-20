@@ -1,0 +1,71 @@
+local collector = require 'collector'
+
+local _M = {}
+
+local function listen_to(data, observe, computed, el)
+    local bind_to = assert(el.BindTo, 'invalid BindTo:' .. el.BindTo)
+    local is_computed = not not computed[bind_to]
+    if is_computed then
+        local associate = {}
+        local get = computed[bind_to]
+        observe:read_report(function(path)
+            table.insert(associate, path)
+        end)
+        local value = get(data)
+        observe:read_report()
+        --print('computed', bind_to, value)
+        el.Value = value
+        for _, path in ipairs(associate) do
+            observe:watch(path, function()
+                el.Value = get(data)
+            end)
+        end
+    else
+        el.Value = observe:getter(bind_to)(data)
+        observe:watch(bind_to, function(_, value, old)
+            el.Value = value
+        end)
+    end
+end
+
+local function watch_to(data, observe, el)
+    local bind_to = assert(el.BindTo, 'invalid BindTo:' .. el.BindTo)
+    local set = observe:setter(bind_to)
+    el.OnValueChange = function(value)
+        set(data, value)
+    end
+end
+
+local function bind_action(data, methods, el)
+    local func = assert(methods[el.BindTo], 'invalid BindTo:' .. el.BindTo)
+    el.OnAction = function(...)
+        func(data, ...)
+    end
+end
+
+function _M.bind(data, observe, computed, methods, root)
+    local bindings = collector.collect(root)
+    for _, obj in ipairs(bindings[1]) do
+        listen_to(data, observe, computed, obj)
+    end
+    
+    for _, obj in ipairs(bindings[2]) do
+        watch_to(data, observe, obj)
+    end
+    
+    for _, obj in ipairs(bindings[3]) do
+        bind_action(data, methods, obj)
+    end
+    
+    local function detach()
+        for _, obj in ipairs(bindings[2]) do
+            obj.OnValueChange = nil
+        end
+        for _, obj in ipairs(bindings[3]) do
+            obj.OnAction = nil
+        end
+    end
+    return detach
+end
+
+return _M

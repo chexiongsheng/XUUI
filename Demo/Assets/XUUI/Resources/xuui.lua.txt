@@ -1,0 +1,27 @@
+local observeable = require 'observeable'
+local binding =  require 'binding'
+
+local _M = {}
+
+
+--options = {
+--    el = root,
+--    data = {},
+--    computed = {},
+--    methods = {},
+--}
+
+local function new(options)
+    local observe = observeable.new(options.data)
+    
+    local detach, update = binding.bind(options.data, observe, options.computed, options.methods, options.el)
+    
+    return {
+        detach = detach,
+        update = update,
+    }
+end
+
+_M.new = new
+
+return _M
