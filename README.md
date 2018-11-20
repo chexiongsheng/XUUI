@@ -37,7 +37,7 @@ xuui.new(options)，options字段基本和vue一样
 
 * el传要绑定的UI元素根节点
 * data就是ViewModle（VM）
-* computed中引用到的VM元素，在其依赖的VM元素发生改变会自动重现计算并同步到各绑定节点
+* computed中引用到的VM元素，在其依赖的VM元素发生改变会自动重新计算并同步到各个绑定了它（比如上例的message）的节点
 * methods是类似按钮点击事件绑定的响应方法
 
 返回是一个handler，目前有个detach方法用于去绑定。
