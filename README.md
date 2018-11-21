@@ -24,33 +24,33 @@ public class Helloworld : MonoBehaviour
 {
     LuaEnv luaenv = new LuaEnv();
 
-    MVVM xuui = null;
+    MVVM mvvm = null;
 
     void Start()
     {
         MVVM.Env = luaenv;
 
-        xuui = new MVVM(gameObject, @"
+        mvvm = new MVVM(gameObject, @"
             local select_info = {'vegetables', 'meat'}
 
             return {
-               data = {
-	               info = {
-                       name = 'john',
-                   },
-	               select = 0,
-               },
-               computed = {
-	               message = function(data)
-		               return 'Hello ' .. data.info.name .. ', your choice is ' .. tostring(select_info[data.select + 1])
-	               end
-               },
-               methods = {
-	               reset = function(data)
-		               data.info.name = 'john'
-		               data.select = 0
-	               end,
-               },
+                data = {
+                    info = {
+                        name = 'john',
+                    },
+                    select = 0,
+                },
+                computed = {
+                    message = function(data)
+                        return 'Hello ' .. data.info.name .. ', your choice is ' .. tostring(select_info[data.select + 1])
+                    end
+                },
+                methods = {
+                    reset = function(data)
+                        data.info.name = 'john'
+                        data.select = 0
+                    end,
+                },
             }
         ");
         
@@ -58,7 +58,7 @@ public class Helloworld : MonoBehaviour
 
     void OnDestroy()
     {
-        xuui.Dispose();
+        mvvm.Dispose();
         MVVM.Env = null;
         luaenv.Dispose();
     }
@@ -136,16 +136,16 @@ local _M = {}
 
 function _M.collect(go)
     local infos = CS.XUUI.UGUIAdapter.Collector.Collect(go)
-	local r = {}
-	
-	for i = 0, infos.Length - 1 do
-	    local objs = infos[i]
+    local r = {}
+    
+    for i = 0, infos.Length - 1 do
+        local objs = infos[i]
         local t = {}
-		for j = 0, objs.Length - 1 do
+        for j = 0, objs.Length - 1 do
             table.insert(t, objs[j])
-		end
+        end
         table.insert(r, t)
-	end
+    end
     
     return r
 end
