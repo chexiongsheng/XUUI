@@ -41,6 +41,12 @@ namespace XUUI
 
         Action detach;
 
+        LuaTable options;
+
+        GameObject root;
+
+        bool attached = false;
+
         public static Func<LuaTable> Compile(string script)
         {
             if (luaEnv == null)
@@ -51,24 +57,40 @@ namespace XUUI
             return luaEnv.LoadString<Func<LuaTable>>(script);
         }
 
-        public MVVM(GameObject root, string script) : this(root, Compile(script))
+        public MVVM(GameObject root, string script, bool doAttach = true) : this(root, Compile(script), doAttach)
         {
         }
 
-        public MVVM(GameObject root, Func<LuaTable> compiled)
+        public MVVM(GameObject root, Func<LuaTable> compiled, bool doAttach = true)
         {
             if (luaEnv == null)
             {
                 throw new InvalidOperationException("Please set LuaEnv first!");
             }
 
-            LuaTable tbl = compiled();
-            detach = creator(root, tbl);
+            this.root = root;
+            options = compiled();
+            if (doAttach)
+            {
+                Attach();
+            }
+        }
+
+        public void Attach()
+        {
+            if (!attached)
+            {
+                detach = creator(root, options);
+                attached = true;
+            }
         }
 
         public void Dispose()
         {
+            attached = false;
             detach();
+            root = null;
+            options = null;
             detach = null;
         }
     }
