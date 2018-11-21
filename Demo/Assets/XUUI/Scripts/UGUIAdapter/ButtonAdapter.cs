@@ -6,7 +6,7 @@ namespace XUUI.UGUIAdapter
 {
     public class ButtonAdapter : MonoBehaviour, EventEmitter
     {
-        private Button target;
+        public Button Target;
 
         public string BindTo;
 
@@ -14,8 +14,12 @@ namespace XUUI.UGUIAdapter
 
         void Awake()
         {
-            target = gameObject.GetComponent<Button>();
-            target.onClick.AddListener(() =>
+            if (Target == null)
+            {
+                Target = gameObject.GetComponent<Button>();
+            }
+
+            Target.onClick.AddListener(() =>
             {
                 if (OnAction != null)
                 {
