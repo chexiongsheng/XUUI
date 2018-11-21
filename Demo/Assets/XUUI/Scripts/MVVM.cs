@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using XLua;
 using System;
 
@@ -9,7 +9,7 @@ namespace XUUI
     {
         static volatile LuaEnv luaEnv = null;
 
-        static Func<GameObject, LuaTable, Action> creator = null;
+        static Func<LuaTable, Func<GameObject, Action>> creator = null;
 
         static Action<LuaTable, string, object, string> eventSetter = null;
 
@@ -21,16 +21,8 @@ namespace XUUI
                 {
                     luaEnv = value;
 
-                    creator = luaEnv.LoadString<Func<Func<GameObject, LuaTable, Action>>>(@"
-                        local xuui = require 'xuui'
-                        return function(el, options)
-                            options = options or {}
-                            options.el = el
-                            options.data = options.data or {}
-                            options.computed = options.computed or {}
-                            options.methods = options.methods or {}
-                            return xuui.new(options).detach
-                        end
+                    creator = luaEnv.LoadString<Func<Func<LuaTable, Func<GameObject, Action>>>>(@"
+                        return (require 'xuui').new
                     ", "@xuui_init.lua")();
 
                     eventSetter = luaEnv.LoadString<Func<Action<LuaTable, string, object, string>>>(@"
@@ -46,19 +38,14 @@ namespace XUUI
                 }
                 else
                 {
+                    eventSetter = null;
                     creator = null;
                     luaEnv = null;
                 }
             }
         }
 
-        Action detach;
-
-        LuaTable options;
-
-        GameObject root;
-
-        bool attached = false;
+        Func<GameObject, Action> attach;
 
         public static Func<LuaTable> Compile(string script)
         {
@@ -70,68 +57,63 @@ namespace XUUI
             return luaEnv.LoadString<Func<LuaTable>>(script);
         }
 
-        public MVVM(GameObject root)
+        public MVVM()
         {
             if (luaEnv == null)
             {
                 Env = new LuaEnv();
             }
-
-            this.root = root;
-            options = luaEnv.NewTable();
+            init(luaEnv.NewTable());
         }
 
-        public MVVM(GameObject root, string script, bool doAttach = true) : this(root, Compile(script), doAttach)
+        public MVVM(string script) : this(Compile(script))
         {
         }
 
-        public MVVM(GameObject root, Func<LuaTable> compiled, bool doAttach = true)
+        public MVVM(Func<LuaTable> compiled)
+        {
+            init(compiled());
+        }
+
+        LuaTable options;
+
+        void init(LuaTable options)
         {
             if (luaEnv == null)
             {
-                throw new InvalidOperationException("Please set LuaEnv first!");
+                Env = new LuaEnv();
             }
-
-            this.root = root;
-            options = compiled();
-            if (doAttach)
-            {
-                Attach();
-            }
+            this.options = options;
+            attach = creator(options);
         }
 
-        public void Attach()
+        Dictionary<GameObject, Action> detachors = new Dictionary<GameObject, Action>();
+
+        public void Attach(GameObject go)
         {
-            if (attached)
+            if (detachors.ContainsKey(go))
             {
-                throw new Exception("attached!");
+                throw new InvalidOperationException("attached GameObject");
             }
-
-            detach = creator(root, options);
-            attached = true;
-
-            root = null;
-            options = null;
+            var detach = attach(go);
+            detachors.Add(go, detach);
         }
 
         public void AddEventHandler(string eventName, object obj, string methodName)
         {
-            if (attached)
-            {
-                throw new Exception("attached!");
-            }
-
             eventSetter(options, eventName, obj, methodName);
         }
 
         public void Dispose()
         {
-            attached = false;
-            detach();
-            root = null;
+            foreach(var kv in detachors)
+            {
+                kv.Value();
+            }
+
+            detachors = null;
             options = null;
-            detach = null;
-            eventSetter = null;
+            attach = null;
         }
     }
 }

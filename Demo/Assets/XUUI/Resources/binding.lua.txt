@@ -13,7 +13,7 @@ local function compile(str)
     return load(code)()
 end
 
-local function listen_to(data, observe, computed, el)
+local function listen_to(data, observe, computed, el, cbs)
     local bind_to = assert(el.BindTo, 'invalid BindTo:' .. el.BindTo)
     local is_computed = not not computed[bind_to]
     local is_computed_bind = not not (bind_to:find('$%.'))
@@ -28,15 +28,17 @@ local function listen_to(data, observe, computed, el)
         --print('computed', bind_to, value)
         el.Value = value
         for _, path in ipairs(associate) do
-            observe:watch(path, function()
+            local cb = observe:watch(path, function()
                 el.Value = observeable.raw(get(data))
             end)
+            table.insert(cbs, cb)
         end
     else
         el.Value = observeable.raw(observe:getter(bind_to)(data))
-        observe:watch(bind_to, function(_, value, old)
+        local cb = observe:watch(bind_to, function(_, value, old)
             el.Value = observeable.raw(value)
         end)
+        table.insert(cbs, cb)
     end
 end
 
@@ -57,8 +59,9 @@ end
 
 function _M.bind(data, observe, computed, methods, root)
     local bindings = collector.collect(root)
+    local cbs = {}
     for _, obj in ipairs(bindings[1]) do
-        listen_to(data, observe, computed, obj)
+        listen_to(data, observe, computed, obj, cbs)
     end
     
     for _, obj in ipairs(bindings[2]) do
@@ -70,6 +73,9 @@ function _M.bind(data, observe, computed, methods, root)
     end
     
     local function detach()
+        for _, cb in ipairs(cbs) do
+            observe:unwatch(cb)
+        end
         for _, obj in ipairs(bindings[2]) do
             obj.OnValueChange = nil
         end

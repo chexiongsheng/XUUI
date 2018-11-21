@@ -12,14 +12,18 @@ local _M = {}
 --}
 
 local function new(options)
+    options = options or {}
+    options.data = options.data or {}
+    options.computed = options.computed or {}
+    options.methods = options.methods or {}
+    
     local observe = observeable.new(options.data)
     
-    local detach, update = binding.bind(options.data, observe, options.computed, options.methods, options.el)
+    local function attach(el)
+        return binding.bind(options.data, observe, options.computed, options.methods, el)
+    end
     
-    return {
-        detach = detach,
-        update = update,
-    }
+    return attach
 end
 
 _M.new = new

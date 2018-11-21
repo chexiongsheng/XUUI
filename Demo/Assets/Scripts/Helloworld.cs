@@ -12,7 +12,7 @@ public class Helloworld : MonoBehaviour
     {
         MVVM.Env = luaenv;
 
-        mvvm = new MVVM(gameObject, @"
+        mvvm = new MVVM(@"
             local select_info = {'vegetables', 'meat'}
 
             return {
@@ -36,6 +36,7 @@ public class Helloworld : MonoBehaviour
             }
         ");
 
+        mvvm.Attach(gameObject);
     }
 
     void OnDestroy()

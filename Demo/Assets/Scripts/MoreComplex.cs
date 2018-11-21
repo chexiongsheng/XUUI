@@ -12,7 +12,7 @@ public class MoreComplex : MonoBehaviour
     {
         MVVM.Env = luaenv;
 
-        mvvm = new MVVM(gameObject, @"
+        mvvm = new MVVM(@"
             local observeable = require 'observeable'
 
             return {
@@ -35,10 +35,11 @@ public class MoreComplex : MonoBehaviour
                     static_csharp_callback = CS.SomeClass.Foo,
                 },
             }
-        ", false);
+        ");
 
         mvvm.AddEventHandler("instance_csharp_callback", new SomeClass(1024), "Bar");
-        mvvm.Attach();
+
+        mvvm.Attach(gameObject);
     }
 
     void OnDestroy()

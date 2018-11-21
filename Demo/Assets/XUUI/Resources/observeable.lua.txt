@@ -164,8 +164,21 @@ local function new(data)
                 callback_info[pp] = callback_info[pp] or {}
                 insert(callback_info[pp], real_callback)
             end
+            
+            return real_callback
         end,
-        unwatch = function(self, path, callback)
+        unwatch = function(self, real_callback)
+            for _, cbs in pairs(callback_info) do
+                local rm = {}
+                for i, cb in ipairs(cbs) do
+                    if cb == real_callback then
+                        table.insert(rm, 1, i)
+                    end
+                end
+                for _, pos in ipairs(rm) do
+                    table.remove(cbs, pos)
+                end
+            end
         end,
         setter = function(self, path)
             local keys = parse_path(path)

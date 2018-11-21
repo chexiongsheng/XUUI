@@ -7,10 +7,10 @@ public class NoLua : MonoBehaviour
 
     void Start()
     {
-        mvvm = new MVVM(gameObject);
+        mvvm = new MVVM();
         mvvm.AddEventHandler("Foo", this, "Foo");
         mvvm.AddEventHandler("Bar", this, "Bar");
-        mvvm.Attach();
+        mvvm.Attach(gameObject);
     }
 
     public void Foo(Interface1 data)
