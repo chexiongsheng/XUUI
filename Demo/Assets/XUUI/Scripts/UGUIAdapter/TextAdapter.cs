@@ -5,7 +5,7 @@ namespace XUUI.UGUIAdapter
 {
     public class TextAdapter : MonoBehaviour, DataConsumer<string>
     {
-        public Text Target;
+        private Text target;
 
         public string BindTo;
 
@@ -13,8 +13,13 @@ namespace XUUI.UGUIAdapter
         {
             set
             {
-                Target.text = value;
+                target.text = value;
             }
+        }
+
+        void Start()
+        {
+            target = gameObject.GetComponent<Text>();
         }
     }
 }

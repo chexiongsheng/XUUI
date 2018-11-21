@@ -1,28 +1,30 @@
 ﻿using UnityEngine;
 using XLua;
-using System;
+using XUUI;
 
 public class Helloworld : MonoBehaviour
 {
     LuaEnv luaenv = new LuaEnv();
 
-    Action detach = null;
+    MVVM mvvm = null;
 
     void Start()
     {
-        detach = luaenv.LoadString<Func<object, Action>>(@"
-            local xuui = require 'xuui'
+        MVVM.Env = luaenv;
+
+        mvvm = new MVVM(gameObject, @"
             local select_info = {'vegetables', 'meat'}
 
-            local mvvm = xuui.new {
-               el = select(1, ...),
+            return {
                data = {
-	               name = 'john',
+	               info = {
+                       name = 'john',
+                   },
 	               select = 0,
                },
                computed = {
 	               message = function(data)
-		               return 'Hello ' .. data.name .. ', your choice is ' .. tostring(select_info[data.select + 1])
+		               return 'Hello ' .. data.info.name .. ', your choice is ' .. tostring(select_info[data.select + 1])
 	               end
                },
                methods = {
@@ -32,15 +34,14 @@ public class Helloworld : MonoBehaviour
 	               end,
                },
             }
-            return mvvm.detach
-        ", "@main.lua")(gameObject);
+        ");
         
     }
 
     void OnDestroy()
     {
-        detach();
-        detach = null;
+        mvvm.Dispose();
+        MVVM.Env = null;
         luaenv.Dispose();
     }
 }

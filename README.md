@@ -4,56 +4,77 @@
 
 ## 示例
 
-### lua侧
+### 设置绑定信息
 
-接口和vue非常类似：
+将XXXAdapter拖到GameObject，然后设置BindTo属性即可。
 
-~~~lua
-local xuui = require 'xuui'
-local select_info = {'vegetables', 'meat'}
+比如InputField添加一个，InputFieldAdapter，设置BindTo信息为"info.name"
 
-local mvvm = xuui.new {
-   el = select(1, ...), -- 从参数传过来，或者类似CS.UnityEngine.GameObject.Find('Canvas')主动获取也可以
-   data = {
-       name = 'john',
-       select = 0,
-   },
-   computed = {
-       message = function(data)
-           return 'Hello ' .. data.name .. ', your choice is ' .. tostring(select_info[data.select + 1])
-       end
-   },
-   methods = {
-       reset = function(data)
-           data.name = 'john'
-           data.select = 0
-       end,
-   },
+本示例UI节点的绑定信息如下：
+
+* InputField: info.name
+* Text      : message
+* Dropdown  : select
+* Button    : reset
+
+### 代码
+
+~~~csharp
+public class Helloworld : MonoBehaviour
+{
+    LuaEnv luaenv = new LuaEnv();
+
+    MVVM xuui = null;
+
+    void Start()
+    {
+        MVVM.Env = luaenv;
+
+        xuui = new MVVM(gameObject, @"
+            local select_info = {'vegetables', 'meat'}
+
+            return {
+               data = {
+	               info = {
+                       name = 'john',
+                   },
+	               select = 0,
+               },
+               computed = {
+	               message = function(data)
+		               return 'Hello ' .. data.info.name .. ', your choice is ' .. tostring(select_info[data.select + 1])
+	               end
+               },
+               methods = {
+	               reset = function(data)
+		               data.name = 'john'
+		               data.select = 0
+	               end,
+               },
+            }
+        ");
+        
+    }
+
+    void OnDestroy()
+    {
+        xuui.Dispose();
+        MVVM.Env = null;
+        luaenv.Dispose();
+    }
 }
-return mvvm.detach
 ~~~
 
-xuui.new(options)，options字段基本和vue一样
+MVVM构造函数的参数1是要绑定的ui根节点，参数2是一个lua脚本，该脚本仅简单的返回一个table，该table各字段含义如下：
 
-* el传要绑定的UI元素根节点
 * data就是ViewModle（VM）
 * computed中引用到的VM元素，在其依赖的VM元素发生改变会自动重新计算并同步到各个绑定了它（比如上例的message）的节点
 * methods是类似按钮点击事件绑定的响应方法
-
-返回是一个handler，目前有个detach方法用于去绑定。
-
-### C#侧
-
-将XXXAdapter拖到GameObject，然后设置Target和BindTo属性即可。
-
-比如InputFieldAdapter，拖动到一个InputField节点，然后把该节点拖动到Target，设置BindTo（本实例为name），然后当lua侧VM中的data.name发生变化时，InputField会自动改变，更改该InputField时，也会自动修改data.name，进而同步到其它也绑定到name的UI节点。
 
 
 ## 扩展
 
 本框架设计上就避免和具体某个UI库耦合，通过实现一套Adapter以及一个AdapterCollector，即可和任意UI库配合。
-
-注意：这部分和具体UI适配一次后就可以不管了，后续本项目会逐渐完善对各种UI的适配器
 
 ### Adapter实现
 

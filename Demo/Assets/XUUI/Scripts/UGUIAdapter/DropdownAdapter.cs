@@ -7,7 +7,7 @@ namespace XUUI.UGUIAdapter
 {
     public class DropdownAdapter : MonoBehaviour, DataConsumer<int>, DataProducer<int>
     {
-        public Dropdown Target;
+        private Dropdown target;
 
         public string BindTo;
 
@@ -17,13 +17,14 @@ namespace XUUI.UGUIAdapter
         {
             set
             {
-                Target.value = value;
+                target.value = value;
             }
         }
 
         void Start()
         {
-            Target.onValueChanged.AddListener((val) =>
+            target = gameObject.GetComponent<Dropdown>();
+            target.onValueChanged.AddListener((val) =>
             {
                 if (OnValueChange != null)
                 {

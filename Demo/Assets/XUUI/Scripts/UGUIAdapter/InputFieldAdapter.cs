@@ -6,7 +6,7 @@ namespace XUUI.UGUIAdapter
 {
     public class InputFieldAdapter : MonoBehaviour, DataConsumer<string>, DataProducer<string>
     {
-        public InputField Target;
+        private InputField target;
 
         public string BindTo;
 
@@ -16,13 +16,14 @@ namespace XUUI.UGUIAdapter
         {
             set
             {
-                Target.text = value;
+                target.text = value;
             }
         }
 
         void Start()
         {
-            Target.onValueChange.AddListener((val) =>
+            target = gameObject.GetComponent<InputField>();
+            target.onValueChange.AddListener((val) =>
             {
                 if (OnValueChange != null)
                 {
