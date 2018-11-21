@@ -4,11 +4,8 @@ using System;
 
 namespace XUUI.UGUIAdapter
 {
-    public class InputFieldAdapter : MonoBehaviour, DataConsumer<string>, DataProducer<string>
+    public class InputFieldAdapter : AdapterBase<InputField>, DataConsumer<string>, DataProducer<string>
     {
-        public InputField Target;
-
-        public string BindTo;
 
         public Action<string> OnValueChange { get; set; } // InputField发生变化需要调用OnValueChange
 
@@ -20,13 +17,8 @@ namespace XUUI.UGUIAdapter
             }
         }
 
-        void Awake()
+        void Start()
         {
-            if (Target == null)
-            {
-                Target = gameObject.GetComponent<InputField>();
-            }
-
             Target.onValueChange.AddListener((val) =>
             {
                 if (OnValueChange != null)

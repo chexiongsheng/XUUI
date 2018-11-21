@@ -5,12 +5,8 @@ using XLua;
 
 namespace XUUI.UGUIAdapter
 {
-    public class DropdownOptionsAdapter : MonoBehaviour, DataConsumer<LuaTable>
+    public class DropdownOptionsAdapter : AdapterBase<Dropdown>, DataConsumer<LuaTable>
     {
-        public Dropdown Target;
-
-        public string BindTo;
-
         public LuaTable Value
         {
             set
@@ -23,13 +19,6 @@ namespace XUUI.UGUIAdapter
             }
         }
 
-        void Awake()
-        {
-            if (Target == null)
-            {
-                Target = gameObject.GetComponent<Dropdown>();
-            }
-        }
     }
 }
 

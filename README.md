@@ -84,7 +84,7 @@ MVVM构造函数的参数1是要绑定的ui根节点，参数2是一个lua脚本
 
 以Unity下的UGUI为例，划重点：
 
-* 一个Adapter，必须得有一个BindTo字段，用于设置/访问绑定信息
+* 继承AdapterBase<要适配的UI类>
 * 如果其需要监听VM变化，须实现DataConsumer接口（可以不显式声明实现，只要有DataConsumer声明的接口即可）
 * 如果其需要把数据同步回VM，须实现DataProducer接口
 * 如果其需要产生一个事件，须实现EventEmitter接口
@@ -96,11 +96,8 @@ using System;
 
 namespace XUUI.UGUIAdapter
 {
-    public class InputFieldAdapter : MonoBehaviour, DataConsumer<string>, DataProducer<string>
+    public class InputFieldAdapter : AdapterBase<InputField>, DataConsumer<string>, DataProducer<string>
     {
-        public InputField Target;
-
-        public string BindTo;
 
         public Action<string> OnValueChange { get; set; } // InputField发生变化需要调用OnValueChange
 

@@ -4,21 +4,12 @@ using System;
 
 namespace XUUI.UGUIAdapter
 {
-    public class ButtonAdapter : MonoBehaviour, EventEmitter
+    public class ButtonAdapter : AdapterBase<Button>, EventEmitter
     {
-        public Button Target;
-
-        public string BindTo;
-
         public Action OnAction { get; set; }
 
-        void Awake()
+        void Start()
         {
-            if (Target == null)
-            {
-                Target = gameObject.GetComponent<Button>();
-            }
-
             Target.onClick.AddListener(() =>
             {
                 if (OnAction != null)

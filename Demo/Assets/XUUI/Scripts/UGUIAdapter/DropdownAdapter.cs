@@ -4,12 +4,8 @@ using System;
 
 namespace XUUI.UGUIAdapter
 {
-    public class DropdownAdapter : MonoBehaviour, DataConsumer<int>, DataProducer<int>
+    public class DropdownAdapter : AdapterBase<Dropdown>, DataConsumer<int>, DataProducer<int>
     {
-        public Dropdown Target;
-
-        public string BindTo;
-
         public Action<int> OnValueChange { get; set; }
 
         public int Value
@@ -20,13 +16,8 @@ namespace XUUI.UGUIAdapter
             }
         }
 
-        void Awake()
+        void Start()
         {
-            if (Target == null)
-            {
-                Target = gameObject.GetComponent<Dropdown>();
-            }
-
             Target.onValueChanged.AddListener((val) =>
             {
                 if (OnValueChange != null)
