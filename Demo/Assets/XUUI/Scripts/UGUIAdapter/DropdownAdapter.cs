@@ -21,7 +21,7 @@ namespace XUUI.UGUIAdapter
             }
         }
 
-        void Start()
+        void Awake()
         {
             target = gameObject.GetComponent<Dropdown>();
             target.onValueChanged.AddListener((val) =>

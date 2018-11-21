@@ -12,7 +12,7 @@ namespace XUUI.UGUIAdapter
 
         public Action OnAction { get; set; }
 
-        void Start()
+        void Awake()
         {
             target = gameObject.GetComponent<Button>();
             target.onClick.AddListener(() =>

@@ -17,7 +17,7 @@ namespace XUUI.UGUIAdapter
             }
         }
 
-        void Start()
+        void Awake()
         {
             target = gameObject.GetComponent<Text>();
         }

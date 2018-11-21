@@ -41,14 +41,28 @@ namespace XUUI
 
         Action detach;
 
-        public MVVM(GameObject root, string script)
+        public static Func<LuaTable> Compile(string script)
         {
             if (luaEnv == null)
             {
                 throw new InvalidOperationException("Please set LuaEnv first!");
             }
 
-            LuaTable tbl = luaEnv.LoadString<Func<LuaTable>>(script)();
+            return luaEnv.LoadString<Func<LuaTable>>(script);
+        }
+
+        public MVVM(GameObject root, string script) : this(root, Compile(script))
+        {
+        }
+
+        public MVVM(GameObject root, Func<LuaTable> compiled)
+        {
+            if (luaEnv == null)
+            {
+                throw new InvalidOperationException("Please set LuaEnv first!");
+            }
+
+            LuaTable tbl = compiled();
             detach = creator(root, tbl);
         }
 
