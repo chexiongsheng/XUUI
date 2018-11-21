@@ -124,12 +124,21 @@ local function to_ordinary_table(tbl)
     return ret
 end
 
+local function init_dir(data, keys)
+    for i, key in ipairs(keys) do
+        if i ~= #keys then
+            data[key] = data[key] or {}
+        end
+    end
+end
+
 local function new(data)
     local callback_info = {}
     observeable_init(data, data, "", callback_info)
     return {
         watch = function(self, path, callback) -- TODO: 去重
             local keys = parse_path(path)
+            init_dir(data, keys)
             local function get(obj)
                 for _, key in ipairs(keys) do
                     if not obj then return end

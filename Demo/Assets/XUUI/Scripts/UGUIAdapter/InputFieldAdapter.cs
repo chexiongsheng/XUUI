@@ -13,7 +13,7 @@ namespace XUUI.UGUIAdapter
         {
             set
             {
-                Target.text = value;
+                Target.text = value == null ? "" : value;
             }
         }
 
