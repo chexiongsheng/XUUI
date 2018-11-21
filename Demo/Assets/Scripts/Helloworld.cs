@@ -29,7 +29,7 @@ public class Helloworld : MonoBehaviour
                },
                methods = {
 	               reset = function(data)
-		               data.name = 'john'
+		               data.info.name = 'john'
 		               data.select = 0
 	               end,
                },
