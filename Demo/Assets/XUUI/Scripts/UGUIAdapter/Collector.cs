@@ -18,6 +18,7 @@ namespace XUUI.UGUIAdapter
             var dataConsumers = go.GetComponentsInChildren<TextAdapter>(true)
                 .Select(o => (object)o)
                 .Concat(dataProducers)
+                .Concat(go.GetComponentsInChildren<DropdownOptionsAdapter>(true))
                 .ToArray();
 
             var eventEmitters = go.GetComponentsInChildren<ButtonAdapter>(true).Select(o => (object)o).ToArray();

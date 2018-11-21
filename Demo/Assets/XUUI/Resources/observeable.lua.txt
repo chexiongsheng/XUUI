@@ -70,7 +70,7 @@ local function observeable_init(obj, root, path, callback_info)
             if old == nil or v == nil then
                 self_callback()
             end
-        end
+        end,
     })
 
     return obj
@@ -102,6 +102,26 @@ local function parse_path(path)
     end
     --print('finish parse ' .. path)
     return result
+end
+
+local function to_ordinary_table(tbl)
+    if type(tbl) ~= 'table' then
+        return tbl
+    end
+    
+    local mt = getmetatable(tbl)
+    local raw = mt and mt.__raw
+    if not raw then
+        return tbl
+    end
+    
+    local ret = {}
+    
+    for k, v in pairs(raw) do
+        ret[k] = to_ordinary_table(v)
+    end
+    
+    return ret
 end
 
 local function new(data)
@@ -165,10 +185,15 @@ local function new(data)
         read_report = function(self, callback)
             read_report = callback
         end,
+        
+        raw = function(self, tbl)
+            return to_ordinary_table(tbl)
+        end
     }
 end
 
 _M.new = new
+_M.raw = to_ordinary_table
 
 ----------------------------test----------------------------
 

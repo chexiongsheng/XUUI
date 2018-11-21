@@ -14,6 +14,7 @@ namespace XUUI.UGUIAdapter
             typeof(InputFieldAdapter),
             typeof(DropdownAdapter),
             typeof(ButtonAdapter),
+            typeof(DropdownOptionsAdapter),
         };
 
         [CSharpCallLua]

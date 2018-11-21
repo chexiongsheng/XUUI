@@ -1,4 +1,5 @@
 local collector = require 'collector'
+local observeable = require 'observeable'
 
 local _M = {}
 
@@ -11,19 +12,19 @@ local function listen_to(data, observe, computed, el)
         observe:read_report(function(path)
             table.insert(associate, path)
         end)
-        local value = get(data)
+        local value = observeable.raw(get(data))
         observe:read_report()
         --print('computed', bind_to, value)
         el.Value = value
         for _, path in ipairs(associate) do
             observe:watch(path, function()
-                el.Value = get(data)
+                el.Value = observeable.raw(get(data))
             end)
         end
     else
-        el.Value = observe:getter(bind_to)(data)
+        el.Value = observeable.raw(observe:getter(bind_to)(data))
         observe:watch(bind_to, function(_, value, old)
-            el.Value = value
+            el.Value = observeable.raw(value)
         end)
     end
 end

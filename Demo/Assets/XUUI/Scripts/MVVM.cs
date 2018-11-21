@@ -11,6 +11,8 @@ namespace XUUI
 
         static Func<GameObject, LuaTable, Action> creator = null;
 
+        static Action<LuaTable, string, object, string> eventSetter = null;
+
         public static LuaEnv Env
         {
             set
@@ -30,6 +32,17 @@ namespace XUUI
                             return xuui.new(options).detach
                         end
                     ", "@xuui_init.lua")();
+
+                    eventSetter = luaEnv.LoadString<Func<Action<LuaTable, string, object, string>>>(@"
+                        return function(options, eventName, obj, methodName)
+                            options = options or {}
+                            options.methods = options.methods or {}
+                            local func = obj[methodName]
+                            options.methods[eventName] = function(data)
+                                func(obj, data)
+                            end
+                        end
+                    ", "@eventSetter.lua")();
                 }
                 else
                 {
@@ -78,11 +91,26 @@ namespace XUUI
 
         public void Attach()
         {
-            if (!attached)
+            if (attached)
             {
-                detach = creator(root, options);
-                attached = true;
+                throw new Exception("attached!");
             }
+
+            detach = creator(root, options);
+            attached = true;
+
+            root = null;
+            options = null;
+        }
+
+        public void AddEventHandler(string eventName, object obj, string methodName)
+        {
+            if (attached)
+            {
+                throw new Exception("attached!");
+            }
+
+            eventSetter(options, eventName, obj, methodName);
         }
 
         public void Dispose()
@@ -92,6 +120,7 @@ namespace XUUI
             root = null;
             options = null;
             detach = null;
+            eventSetter = null;
         }
     }
 }

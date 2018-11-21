@@ -13,6 +13,8 @@ namespace XUUI.UGUIAdapter
             typeof(Func<LuaTable>),
             typeof(Func<UnityEngine.GameObject, LuaTable, Action>),
             typeof(Func<Func<UnityEngine.GameObject, LuaTable, Action>>),
+            typeof(Action<LuaTable, string, object, string>),
+            typeof(Func<Action<LuaTable, string, object, string>>),
         };
     }
 }
