@@ -3,12 +3,23 @@ local observeable = require 'observeable'
 
 local _M = {}
 
+local load = load or loadstring
+
+local function compile(str)
+    local code = "return function(___data)\n"
+                 .. "return "
+                 .. str:gsub("$%.", "___data.")
+                 .. "\nend"
+    return load(code)()
+end
+
 local function listen_to(data, observe, computed, el)
     local bind_to = assert(el.BindTo, 'invalid BindTo:' .. el.BindTo)
     local is_computed = not not computed[bind_to]
-    if is_computed then
+    local is_computed_bind = not not (bind_to:find('$%.'))
+    if is_computed or is_computed_bind then
         local associate = {}
-        local get = computed[bind_to]
+        local get = is_computed_bind and compile(bind_to) or computed[bind_to]
         observe:read_report(function(path)
             table.insert(associate, path)
         end)

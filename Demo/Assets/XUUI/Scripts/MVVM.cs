@@ -7,7 +7,7 @@ namespace XUUI
 {
     public class MVVM : IDisposable
     {
-        static LuaEnv luaEnv = null;
+        static volatile LuaEnv luaEnv = null;
 
         static Func<GameObject, LuaTable, Action> creator = null;
 
@@ -68,6 +68,17 @@ namespace XUUI
             }
 
             return luaEnv.LoadString<Func<LuaTable>>(script);
+        }
+
+        public MVVM(GameObject root)
+        {
+            if (luaEnv == null)
+            {
+                Env = new LuaEnv();
+            }
+
+            this.root = root;
+            options = luaEnv.NewTable();
         }
 
         public MVVM(GameObject root, string script, bool doAttach = true) : this(root, Compile(script), doAttach)
