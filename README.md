@@ -1,6 +1,10 @@
 # XUUI
 
-一个采用lua实现，和具体引擎，具体UI无关，可拓展的mvvm框架。
+一个采用lua（基于xLua）实现的mvvm框架。
+
+* 可以和任意UI库配合，ugui，ngui，fairyGUI。。。Whatever you want
+* 支持把本框架作为一个mvvm驱动器，纯用C#写逻辑
+* 支持“计算属性”：“计算属性”依赖的各属性发生改变会触发“计算属性”的重计算
 
 ## 示例
 
@@ -8,7 +12,7 @@
 
 将XXXAdapter拖到GameObject，然后设置BindTo属性即可。
 
-比如InputField添加一个，InputFieldAdapter，设置BindTo信息为"info.name"
+比如InputField，添加一个InputFieldAdapter，设置BindTo信息为"info.name"，当info.name改变了会自动同步到该InputField，该InputField修改后也会同步通知到各依赖info.name的节点
 
 本示例UI节点的绑定信息如下：
 
@@ -41,7 +45,7 @@ public class Helloworld : MonoBehaviour
                     select = 0,
                 },
                 computed = {
-                    message = function(data)
+                    message = function(data) -- “计算属性”
                         return 'Hello ' .. data.info.name .. ', your choice is ' .. tostring(select_info[data.select + 1])
                     end
                 },
