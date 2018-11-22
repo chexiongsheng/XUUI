@@ -79,11 +79,15 @@ namespace XUUI
 
         Dictionary<GameObject, Action> detachs = new Dictionary<GameObject, Action>();
 
-        public void Attach(GameObject go)
+        public void Attach(GameObject go, bool throwIfFound = false)
         {
             if (detachs.ContainsKey(go))
             {
-                throw new InvalidOperationException("attached GameObject");
+                if (throwIfFound)
+                {
+                    throw new InvalidOperationException("attached GameObject");
+                }
+                return;
             }
             var detach = attach(go);
             detachs.Add(go, detach);
