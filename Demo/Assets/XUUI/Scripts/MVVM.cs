@@ -79,9 +79,9 @@ namespace XUUI
 
         Dictionary<GameObject, Action> detachs = new Dictionary<GameObject, Action>();
 
-        public void Attach(GameObject go, bool throwIfFound = false)
+        public void Attach(GameObject view, bool throwIfFound = false)
         {
-            if (detachs.ContainsKey(go))
+            if (detachs.ContainsKey(view))
             {
                 if (throwIfFound)
                 {
@@ -89,16 +89,16 @@ namespace XUUI
                 }
                 return;
             }
-            var detach = attach(go);
-            detachs.Add(go, detach);
+            var detach = attach(view);
+            detachs.Add(view, detach);
         }
 
-        public void Detach(GameObject go, bool throwIfNotFound = false)
+        public void Detach(GameObject view, bool throwIfNotFound = false)
         {
             Action detach;
-            if (detachs.TryGetValue(go, out detach))
+            if (detachs.TryGetValue(view, out detach))
             {
-                detachs.Remove(go);
+                detachs.Remove(view);
                 detach();
             }
             else if (throwIfNotFound)
