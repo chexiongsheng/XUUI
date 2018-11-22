@@ -4,15 +4,11 @@ using XUUI;
 
 public class Helloworld : MonoBehaviour
 {
-    LuaEnv luaenv = new LuaEnv();
-
-    MVVM mvvm = null;
+    ViewModel mvvm = null;
 
     void Start()
     {
-        MVVM.Env = luaenv;
-
-        mvvm = new MVVM(@"
+        mvvm = new ViewModel(@"
             local select_info = {'vegetables', 'meat'}
 
             return {
@@ -42,7 +38,5 @@ public class Helloworld : MonoBehaviour
     void OnDestroy()
     {
         mvvm.Dispose();
-        MVVM.Env = null;
-        luaenv.Dispose();
     }
 }

@@ -4,15 +4,11 @@ using XUUI;
 
 public class MoreComplex : MonoBehaviour
 {
-    LuaEnv luaenv = new LuaEnv();
-
-    MVVM mvvm = null;
+    ViewModel mvvm = null;
 
     void Start()
     {
-        MVVM.Env = luaenv;
-
-        mvvm = new MVVM(@"
+        mvvm = new ViewModel(@"
             local observeable = require 'observeable'
 
             return {
@@ -45,7 +41,5 @@ public class MoreComplex : MonoBehaviour
     void OnDestroy()
     {
         mvvm.Dispose();
-        MVVM.Env = null;
-        luaenv.Dispose();
     }
 }

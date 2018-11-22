@@ -5,27 +5,33 @@ using System;
 
 namespace XUUI
 {
-    public class MVVM : IDisposable
+    public class ViewModel : IDisposable
     {
-        static volatile LuaEnv luaEnv = null;
+        LuaEnv luaEnv = null;
 
-        static Func<LuaTable, Func<GameObject, Action>> creator = null;
+        Func<LuaTable, Func<GameObject, Action>> creator = null;
 
-        static Action<LuaTable, string, object, string> eventSetter = null;
+        Action<LuaTable, string, object, string> eventSetter = null;
 
-        public static LuaEnv Env
+        bool disposeLuaEnv = false;
+
+        void initLua(LuaEnv env)
         {
-            set
+            if (env == null)
             {
-                if (value != null)
-                {
-                    luaEnv = value;
+                luaEnv = new LuaEnv();
+                disposeLuaEnv = true;
+            }
+            else
+            {
+                luaEnv = env;
+            }
 
-                    creator = luaEnv.LoadString<Func<Func<LuaTable, Func<GameObject, Action>>>>(@"
+            creator = luaEnv.LoadString<Func<Func<LuaTable, Func<GameObject, Action>>>>(@"
                         return (require 'xuui').new
                     ", "@xuui_init.lua")();
 
-                    eventSetter = luaEnv.LoadString<Func<Action<LuaTable, string, object, string>>>(@"
+            eventSetter = luaEnv.LoadString<Func<Action<LuaTable, string, object, string>>>(@"
                         return function(options, eventName, obj, methodName)
                             options = options or {}
                             options.methods = options.methods or {}
@@ -35,43 +41,31 @@ namespace XUUI
                             end
                         end
                     ", "@eventSetter.lua")();
-                }
-                else
-                {
-                    eventSetter = null;
-                    creator = null;
-                    luaEnv = null;
-                }
-            }
         }
+
 
         Func<GameObject, Action> attach;
 
-        public static Func<LuaTable> Compile(string script)
+        public Func<LuaTable> Compile(string script)
         {
-            if (luaEnv == null)
-            {
-                throw new InvalidOperationException("Please set LuaEnv first!");
-            }
-
             return luaEnv.LoadString<Func<LuaTable>>(script);
         }
 
-        public MVVM()
+        public ViewModel(LuaEnv env = null)
         {
-            if (luaEnv == null)
-            {
-                Env = new LuaEnv();
-            }
+            initLua(env);
             init(luaEnv.NewTable());
         }
 
-        public MVVM(string script) : this(Compile(script))
+        public ViewModel(string script, LuaEnv env = null)
         {
+            initLua(env);
+            init(Compile(script)());
         }
 
-        public MVVM(Func<LuaTable> compiled)
+        public ViewModel(Func<LuaTable> compiled, LuaEnv env = null)
         {
+            initLua(env);
             init(compiled());
         }
 
@@ -79,10 +73,6 @@ namespace XUUI
 
         void init(LuaTable options)
         {
-            if (luaEnv == null)
-            {
-                Env = new LuaEnv();
-            }
             this.options = options;
             attach = creator(options);
         }
@@ -104,16 +94,31 @@ namespace XUUI
             eventSetter(options, eventName, obj, methodName);
         }
 
-        public void Dispose()
+        void clearLuaRef()
         {
-            foreach(var kv in detachors)
+            foreach (var kv in detachors)
             {
                 kv.Value();
             }
-
+            detachors.Clear();
             detachors = null;
             options = null;
             attach = null;
+
+            creator = null;
+            eventSetter = null;
+        }
+
+        public void Dispose()
+        {
+            clearLuaRef();
+
+            if (disposeLuaEnv)
+            {
+                luaEnv.Dispose();
+            }
+
+            luaEnv = null;
         }
     }
 }

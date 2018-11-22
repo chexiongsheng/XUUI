@@ -3,11 +3,11 @@ using XUUI;
 
 public class NoLua : MonoBehaviour
 {
-    MVVM mvvm = null;
+    ViewModel mvvm = null;
 
     void Start()
     {
-        mvvm = new MVVM();
+        mvvm = new ViewModel();
         mvvm.AddEventHandler("Foo", this, "Foo");
         mvvm.AddEventHandler("Bar", this, "Bar");
         mvvm.Attach(gameObject);
