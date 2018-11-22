@@ -64,12 +64,13 @@ public class Helloworld : MonoBehaviour
 }
 ~~~
 
-MVVM构造函数的参数1是要绑定的ui根节点，参数2是一个lua脚本，该脚本仅简单的返回一个table，该table各字段含义如下：
+根据一个lua脚本去new一个ViewModel，该脚本仅简单的返回一个table，该table各字段含义如下：
 
 * data就是ViewModle（VM）
 * computed中引用到的VM元素，在其依赖的VM元素发生改变会自动重新计算并同步到各个绑定了它（比如上例的message）的节点
 * methods是类似按钮点击事件绑定的响应方法
 
+然后就可以愉快的Attach到某个UI根节点了（可以Attach多个），这个UI跟节点设置了绑定信息的UI元素都会自动同步。
 
 ## 扩展
 
