@@ -4,6 +4,8 @@ using System;
 
 namespace XUUI.UGUIAdapter
 {
+    [AddComponentMenu("XUUI/Dropdown", 1)]
+    [RequireComponent(typeof(Dropdown))]
     public class DropdownAdapter : AdapterBase<Dropdown>, DataConsumer<int>, DataProducer<int>
     {
         public Action<int> OnValueChange { get; set; }

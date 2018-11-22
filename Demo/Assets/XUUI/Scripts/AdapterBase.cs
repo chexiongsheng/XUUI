@@ -4,6 +4,7 @@ public class AdapterBase<T> : MonoBehaviour
 {
     public T Target;
 
+    [TextArea]
     public string BindTo;
 
     void Awake()

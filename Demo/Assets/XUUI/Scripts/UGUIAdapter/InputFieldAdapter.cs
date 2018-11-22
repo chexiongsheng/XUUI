@@ -4,6 +4,8 @@ using System;
 
 namespace XUUI.UGUIAdapter
 {
+    [AddComponentMenu("XUUI/InputField", 1)]
+    [RequireComponent(typeof(InputField))]
     public class InputFieldAdapter : AdapterBase<InputField>, DataConsumer<string>, DataProducer<string>
     {
 

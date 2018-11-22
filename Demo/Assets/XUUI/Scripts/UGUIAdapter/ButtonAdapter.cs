@@ -4,6 +4,8 @@ using System;
 
 namespace XUUI.UGUIAdapter
 {
+    [AddComponentMenu("XUUI/Button", 1)]
+    [RequireComponent(typeof(Button))]
     public class ButtonAdapter : AdapterBase<Button>, EventEmitter
     {
         public Action OnAction { get; set; }
