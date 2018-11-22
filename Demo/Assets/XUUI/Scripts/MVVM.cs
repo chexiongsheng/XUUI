@@ -77,16 +77,30 @@ namespace XUUI
             attach = creator(options);
         }
 
-        Dictionary<GameObject, Action> detachors = new Dictionary<GameObject, Action>();
+        Dictionary<GameObject, Action> detachs = new Dictionary<GameObject, Action>();
 
         public void Attach(GameObject go)
         {
-            if (detachors.ContainsKey(go))
+            if (detachs.ContainsKey(go))
             {
                 throw new InvalidOperationException("attached GameObject");
             }
             var detach = attach(go);
-            detachors.Add(go, detach);
+            detachs.Add(go, detach);
+        }
+
+        public void Detach(GameObject go, bool throwIfNotFound = false)
+        {
+            Action detach;
+            if (detachs.TryGetValue(go, out detach))
+            {
+                detachs.Remove(go);
+                detach();
+            }
+            else if (throwIfNotFound)
+            {
+                throw new InvalidOperationException("not attached yet!");
+            }
         }
 
         public void AddEventHandler(string eventName, object obj, string methodName)
@@ -96,12 +110,12 @@ namespace XUUI
 
         void clearLuaRef()
         {
-            foreach (var kv in detachors)
+            foreach (var kv in detachs)
             {
                 kv.Value();
             }
-            detachors.Clear();
-            detachors = null;
+            detachs.Clear();
+            detachs = null;
             options = null;
             attach = null;
 
