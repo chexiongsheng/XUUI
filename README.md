@@ -81,13 +81,13 @@ public class Helloworld : MonoBehaviour
 * NoLua.unity(Assets/XLua/Examples/03_UIEvent/): 演示不使用lua，把本框架作为一个mvvm驱动器，纯用C#写逻辑。
 * TestDetach.unity: 演示随意地挂载/卸载UI到一个ViewModel上。
 
-## 扩展
+## 怎么支持各种UI
 
 本框架设计上就避免和具体某个UI库耦合，通过实现一套Adapter以及一个AdapterCollector，即可和任意UI库配合。
 
 ### Adapter实现
 
-以Unity下的UGUI为例，划重点：
+以UGUI为例，划重点：
 
 * 继承AdapterBase<要适配的UI类>
 * 如果其需要监听VM变化，须实现DataConsumer接口（可以不显式声明实现，只要有DataConsumer声明的接口即可）
