@@ -2,7 +2,7 @@
 
 一个采用lua（基于xLua）实现的mvvm框架。
 
-* 可以和任意UI库配合，ugui，ngui，fairyGUI。。。Whatever you want
+* 可以和任意UI库配合，ugui，ngui，fairyGUI，你自己倒腾的UI库。。。Whatever you want
 * 支持把本框架作为一个mvvm驱动器，纯用C#写逻辑
 * 支持“计算属性”：“计算属性”依赖的各属性发生改变会触发“计算属性”的重计算
 
