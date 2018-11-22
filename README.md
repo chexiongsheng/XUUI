@@ -10,14 +10,18 @@
 
 ### 设置绑定信息
 
-通过菜单添加适配器到UI元素上，然后设置BindTo属性即可。BindTo就一个字符串，比如把一个输入框绑定到"info.name"，那么当info.name改变了会自动同步到该输入框，该输入修改后也会通知到各依赖info.name的其它节点。
+比如把一个输入框绑定到"info.name"，那么当info.name改变了会自动同步到该输入框，该输入修改后也会通知到各依赖info.name的其它节点。
 
 Helloworld示例UI节点的绑定信息如下：
 
 * InputField: info.name
 * Text      : message，这是个“计算属性”，其依赖于info.name以及select，当且仅当info.name以及select其中一个发生变化，会触发message重新计算（XUUI会自动计算依赖关系），并自动更新Text。
 * Dropdown  : select
-* Button    : reset
+* Button    : reset，这会绑定到一个reset函数上
+
+绑定怎么操作？
+
+添加添加适配器（继承自MonoBehaviour）到GameObject，可以通过Component/XUUI菜单或者手动到XUUI\Scripts\UGUIAdapter目录找脚本拖放到GameObject，然后设置BindTo属性即可。
 
 ### 代码
 
