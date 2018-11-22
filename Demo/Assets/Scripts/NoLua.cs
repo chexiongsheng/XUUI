@@ -3,14 +3,14 @@ using XUUI;
 
 public class NoLua : MonoBehaviour
 {
-    ViewModel mvvm = null;
+    ViewModel vm = null;
 
     void Start()
     {
-        mvvm = new ViewModel();
-        mvvm.AddEventHandler("Foo", this, "Foo");
-        mvvm.AddEventHandler("Bar", this, "Bar");
-        mvvm.Attach(gameObject);
+        vm = new ViewModel();
+        vm.AddEventHandler("Foo", this, "Foo");
+        vm.AddEventHandler("Bar", this, "Bar");
+        vm.Attach(gameObject);
     }
 
     public void Foo(Interface1 data)
@@ -28,6 +28,6 @@ public class NoLua : MonoBehaviour
 
     void OnDestroy()
     {
-        mvvm.Dispose();
+        vm.Dispose();
     }
 }

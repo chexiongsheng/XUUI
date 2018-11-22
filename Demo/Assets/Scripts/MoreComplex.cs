@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
-using XLua;
 using XUUI;
 
 public class MoreComplex : MonoBehaviour
 {
-    ViewModel mvvm = null;
+    ViewModel vm = null;
 
     void Start()
     {
-        mvvm = new ViewModel(@"
+        vm = new ViewModel(@"
             local observeable = require 'observeable'
 
             return {
@@ -33,13 +32,13 @@ public class MoreComplex : MonoBehaviour
             }
         ");
 
-        mvvm.AddEventHandler("instance_csharp_callback", new SomeClass(1024), "Bar");
+        vm.AddEventHandler("instance_csharp_callback", new SomeClass(1024), "Bar");
 
-        mvvm.Attach(gameObject);
+        vm.Attach(gameObject);
     }
 
     void OnDestroy()
     {
-        mvvm.Dispose();
+        vm.Dispose();
     }
 }

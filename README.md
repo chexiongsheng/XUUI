@@ -26,15 +26,11 @@
 ~~~csharp
 public class Helloworld : MonoBehaviour
 {
-    LuaEnv luaenv = new LuaEnv();
-
-    MVVM mvvm = null;
+    ViewModel vm = null;
 
     void Start()
     {
-        MVVM.Env = luaenv;
-
-        mvvm = new MVVM(@"
+        vm = new ViewModel(@"
             local select_info = {'vegetables', 'meat'}
 
             return {
@@ -58,14 +54,12 @@ public class Helloworld : MonoBehaviour
             }
         ");
 
-        mvvm.Attach(gameObject);
+        vm.Attach(gameObject);
     }
 
     void OnDestroy()
     {
-        mvvm.Dispose();
-        MVVM.Env = null;
-        luaenv.Dispose();
+        vm.Dispose();
     }
 }
 ~~~

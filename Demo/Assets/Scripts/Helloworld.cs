@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
-using XLua;
 using XUUI;
 
 public class Helloworld : MonoBehaviour
 {
-    ViewModel mvvm = null;
+    ViewModel vm = null;
 
     void Start()
     {
-        mvvm = new ViewModel(@"
+        vm = new ViewModel(@"
             local select_info = {'vegetables', 'meat'}
 
             return {
@@ -32,11 +31,11 @@ public class Helloworld : MonoBehaviour
             }
         ");
 
-        mvvm.Attach(gameObject);
+        vm.Attach(gameObject);
     }
 
     void OnDestroy()
     {
-        mvvm.Dispose();
+        vm.Dispose();
     }
 }
