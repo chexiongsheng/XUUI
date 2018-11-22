@@ -72,6 +72,13 @@ public class Helloworld : MonoBehaviour
 
 然后就可以愉快的Attach到某个UI根节点了（可以Attach多个），这个UI跟节点设置了绑定信息的UI元素都会自动同步。
 
+## 例子说明
+
+* Helloworld.unity: 快速入门的例子。
+* MoreComplex.unity: 演示混合使用lua，C#静态函数，C#成员函数作为事件响应，演示怎么监听一个数组的变化并应用到UI元素上。
+* NoLua.unity(Assets/XLua/Examples/03_UIEvent/): 演示不使用lua，把本框架作为一个mvvm驱动器，纯用C#写逻辑。
+* TestDetach.unity: 演示随意地挂载/卸载UI到一个ViewModel上。
+
 ## 扩展
 
 本框架设计上就避免和具体某个UI库耦合，通过实现一套Adapter以及一个AdapterCollector，即可和任意UI库配合。
