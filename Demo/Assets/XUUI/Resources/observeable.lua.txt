@@ -76,33 +76,7 @@ local function observeable_init(obj, root, path, callback_info)
     return obj
 end
 
-local function parse_path(path)
-    if not path or path == '' then error('invalid path:' .. tostring(path)) end
-    --print('start to parse ' .. path)
-    local result = {}
-    local i, n = 1, #path
-    while i <= n do
-        local s, e, split1, key, split2 = find(path, "([%.%[])([^%.^%[^%]]+)(%]?)", i)
-        if not s or s > i then
-            --print('"'.. sub(path, i, s and s - 1).. '"')
-            insert(result, sub(path, i, s and s - 1))
-        end
-        if not s then break end
-        if split1 == '[' then
-            if split2 ~= ']' then error('invalid path:' .. path) end
-            key = tonumber(key)
-            if not key then error('invalid path:' .. path) end
-            --print(key)
-            insert(result, key)
-        else
-            --print('"'.. key .. '"')
-            insert(result, key)
-        end
-        i = e + 1
-    end
-    --print('finish parse ' .. path)
-    return result
-end
+local parse_path = (require 'xuui_utils').parse_path
 
 local function to_ordinary_table(tbl)
     if type(tbl) ~= 'table' then

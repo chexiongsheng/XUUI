@@ -50,8 +50,23 @@ local function watch_to(data, observe, el)
     end
 end
 
+local function get_by_keys(data, keys)
+    for _, key in ipairs(keys) do
+        if type(data) ~= 'table' then return end
+        data = data[key]
+    end
+    return data
+end
+
+local parse_path = (require 'xuui_utils').parse_path
+
 local function bind_action(data, commands, el)
-    local func = assert(commands[el.BindTo], 'invalid BindTo:' .. el.BindTo)
+    local keys = parse_path(el.BindTo)
+    local func = assert(get_by_keys(commands, keys), 'invalid BindTo:' .. el.BindTo)
+    if #keys > 1 then
+        table.remove(keys)
+        data = assert(get_by_keys(data, keys), 'no data for ' .. el.BindTo)
+    end
     el.OnAction = function(...)
         func(data, ...)
     end
