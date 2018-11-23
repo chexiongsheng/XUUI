@@ -5,22 +5,21 @@ local _M = {}
 
 
 --options = {
---    el = root,
 --    data = {},
 --    computed = {},
---    methods = {},
+--    commands = {},
 --}
 
 local function new(options)
     options = options or {}
     options.data = options.data or {}
     options.computed = options.computed or {}
-    options.methods = options.methods or {}
+    options.commands = options.commands or {}
     
     local observe = observeable.new(options.data)
     
     local function attach(el)
-        return binding.bind(options.data, observe, options.computed, options.methods, el)
+        return binding.bind(options.data, observe, options.computed, options.commands, el)
     end
     
     return attach

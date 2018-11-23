@@ -28,11 +28,11 @@ Helloworld示例UI节点的绑定信息如下：
 ~~~csharp
 public class Helloworld : MonoBehaviour
 {
-    ViewModel vm = null;
+    Context context = null;
 
     void Start()
     {
-        vm = new ViewModel(@"
+        context = new Context(@"
             local select_info = {'vegetables', 'meat'}
 
             return {
@@ -47,7 +47,7 @@ public class Helloworld : MonoBehaviour
                         return 'Hello ' .. data.info.name .. ', your choice is ' .. tostring(select_info[data.select + 1])
                     end
                 },
-                methods = {
+                commands = {
                     reset = function(data)
                         data.info.name = 'john'
                         data.select = 0
@@ -56,12 +56,12 @@ public class Helloworld : MonoBehaviour
             }
         ");
 
-        vm.Attach(gameObject);
+        context.Attach(gameObject);
     }
 
     void OnDestroy()
     {
-        vm.Dispose();
+        context.Dispose();
     }
 }
 ~~~

@@ -3,11 +3,11 @@ using XUUI;
 
 public class MoreComplex : MonoBehaviour
 {
-    ViewModel vm = null;
+    Context context = null;
 
     void Start()
     {
-        vm = new ViewModel(@"
+        context = new Context(@"
             local observeable = require 'observeable'
 
             return {
@@ -21,7 +21,7 @@ public class MoreComplex : MonoBehaviour
                         return 'Hello ' .. data.name .. ', your choice is ' .. tostring(data.options[data.select + 1])
                     end
                 },
-                methods = {
+                commands = {
                     add_option = function(data)
                         local tmp = observeable.raw(data.options) -- 只有获取raw后，table.insert之类的函数才能正常操作
                         table.insert(tmp,'Option #' .. (#tmp + 1))
@@ -32,13 +32,13 @@ public class MoreComplex : MonoBehaviour
             }
         ");
 
-        vm.AddEventHandler("instance_csharp_callback", new SomeClass(1024), "Bar");
+        context.AddCommand("instance_csharp_callback", new SomeClass(1024), "Bar");
 
-        vm.Attach(gameObject);
+        context.Attach(gameObject);
     }
 
     void OnDestroy()
     {
-        vm.Dispose();
+        context.Dispose();
     }
 }

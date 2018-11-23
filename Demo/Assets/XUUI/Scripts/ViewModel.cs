@@ -5,13 +5,13 @@ using System;
 
 namespace XUUI
 {
-    public class ViewModel : IDisposable
+    public class Context : IDisposable
     {
         LuaEnv luaEnv = null;
 
         Func<LuaTable, Func<GameObject, Action>> creator = null;
 
-        Action<LuaTable, string, object, string> eventSetter = null;
+        Action<LuaTable, string, object, string> commandSetter = null;
 
         bool disposeLuaEnv = false;
 
@@ -31,12 +31,12 @@ namespace XUUI
                         return (require 'xuui').new
                     ", "@xuui_init.lua")();
 
-            eventSetter = luaEnv.LoadString<Func<Action<LuaTable, string, object, string>>>(@"
+            commandSetter = luaEnv.LoadString<Func<Action<LuaTable, string, object, string>>>(@"
                         return function(options, eventName, obj, methodName)
                             options = options or {}
-                            options.methods = options.methods or {}
+                            options.commands = options.commands or {}
                             local func = obj[methodName]
-                            options.methods[eventName] = function(data)
+                            options.commands[eventName] = function(data)
                                 func(obj, data)
                             end
                         end
@@ -51,19 +51,19 @@ namespace XUUI
             return luaEnv.LoadString<Func<LuaTable>>(script);
         }
 
-        public ViewModel(LuaEnv env = null)
+        public Context(LuaEnv env = null)
         {
             initLua(env);
             init(luaEnv.NewTable());
         }
 
-        public ViewModel(string script, LuaEnv env = null)
+        public Context(string script, LuaEnv env = null)
         {
             initLua(env);
             init(Compile(script)());
         }
 
-        public ViewModel(Func<LuaTable> compiled, LuaEnv env = null)
+        public Context(Func<LuaTable> compiled, LuaEnv env = null)
         {
             initLua(env);
             init(compiled());
@@ -107,9 +107,9 @@ namespace XUUI
             }
         }
 
-        public void AddEventHandler(string eventName, object obj, string methodName)
+        public void AddCommand(string commandName, object obj, string methodName)
         {
-            eventSetter(options, eventName, obj, methodName);
+            commandSetter(options, commandName, obj, methodName);
         }
 
         void clearLuaRef()
@@ -124,7 +124,7 @@ namespace XUUI
             attach = null;
 
             creator = null;
-            eventSetter = null;
+            commandSetter = null;
         }
 
         public void Dispose()

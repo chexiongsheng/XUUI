@@ -50,14 +50,14 @@ local function watch_to(data, observe, el)
     end
 end
 
-local function bind_action(data, methods, el)
-    local func = assert(methods[el.BindTo], 'invalid BindTo:' .. el.BindTo)
+local function bind_action(data, commands, el)
+    local func = assert(commands[el.BindTo], 'invalid BindTo:' .. el.BindTo)
     el.OnAction = function(...)
         func(data, ...)
     end
 end
 
-function _M.bind(data, observe, computed, methods, root)
+function _M.bind(data, observe, computed, commands, root)
     local bindings = collector.collect(root)
     local cbs = {}
     for _, obj in ipairs(bindings[1]) do
@@ -69,7 +69,7 @@ function _M.bind(data, observe, computed, methods, root)
     end
     
     for _, obj in ipairs(bindings[3]) do
-        bind_action(data, methods, obj)
+        bind_action(data, commands, obj)
     end
     
     local function detach()

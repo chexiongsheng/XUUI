@@ -3,14 +3,14 @@ using XUUI;
 
 public class TestDetach : MonoBehaviour
 {
-    ViewModel vm = null;
+    Context context = null;
 
     GameObject panelLeft;
     GameObject panelRight;
 
     void Start()
     {
-        vm = new ViewModel(@"
+        context = new Context(@"
             local observeable = require 'observeable'
 
             return {
@@ -24,7 +24,7 @@ public class TestDetach : MonoBehaviour
                         return 'Hello ' .. data.name .. ', your choice is ' .. tostring(data.options[data.select + 1])
                     end
                 },
-                methods = {
+                commands = {
                     add_option = function(data)
                         local tmp = observeable.raw(data.options) -- 只有获取raw后，table.insert之类的函数才能正常操作
                         table.insert(tmp,'Option #' .. (#tmp + 1))
@@ -35,42 +35,42 @@ public class TestDetach : MonoBehaviour
             }
         ");
 
-        vm.AddEventHandler("instance_csharp_callback", new SomeClass(1024), "Bar");
-        vm.AddEventHandler("attachleft", this, "AttachLeft");
-        vm.AddEventHandler("detachleft", this, "DetachLeft");
-        vm.AddEventHandler("attachright", this, "AttachRight");
-        vm.AddEventHandler("detachright", this, "DetachRight");
+        context.AddCommand("instance_csharp_callback", new SomeClass(1024), "Bar");
+        context.AddCommand("attachleft", this, "AttachLeft");
+        context.AddCommand("detachleft", this, "DetachLeft");
+        context.AddCommand("attachright", this, "AttachRight");
+        context.AddCommand("detachright", this, "DetachRight");
 
 
         var control = GameObject.Find("PanelControl");
         panelLeft = GameObject.Find("PanelLeft");
         panelRight = GameObject.Find("PanelRight");
 
-        vm.Attach(control);
+        context.Attach(control);
     }
 
     public void AttachLeft()
     {
-        vm.Attach(panelLeft);
+        context.Attach(panelLeft);
     }
 
     public void DetachLeft()
     {
-        vm.Detach(panelLeft);
+        context.Detach(panelLeft);
     }
 
     public void AttachRight()
     {
-        vm.Attach(panelRight);
+        context.Attach(panelRight);
     }
 
     public void DetachRight()
     {
-        vm.Detach(panelRight);
+        context.Detach(panelRight);
     }
 
     void OnDestroy()
     {
-        vm.Dispose();
+        context.Dispose();
     }
 }
