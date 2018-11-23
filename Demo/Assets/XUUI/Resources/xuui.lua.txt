@@ -69,7 +69,7 @@ end
 --}
 
 local function new(options)
-    if options.__type == 'app' then
+    if options.modules then
         app_init(options)
     end
     
