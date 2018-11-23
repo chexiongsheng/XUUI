@@ -30,6 +30,15 @@ local function parse_path(path)
     return result
 end
 
+local function get_by_keys(data, keys)
+    for _, key in ipairs(keys) do
+        if type(data) ~= 'table' then return end
+        data = data[key]
+    end
+    return data
+end
+
 return {
     parse_path = parse_path,
+    get_by_keys = get_by_keys,
 }
