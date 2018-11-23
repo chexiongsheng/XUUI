@@ -2,14 +2,22 @@
 
 一个采用lua（基于xLua）实现的mvvm框架。
 
-* 可以和任意UI库配合，ugui，ngui，fairyGUI，你自己倒腾的UI库。。。Whatever you want
-* 支持把本框架作为一个mvvm驱动器，纯用C#写逻辑
-* 支持“计算属性”：“计算属性”依赖的各属性发生改变会触发“计算属性”的重计算
-
 ## 科普MVVM
 
 * mvvm框架，支持你在UI上设置一些绑定路径，比如：info.name ，select啥的，然后你在逻辑代码那修改info.name ，所有绑定到info.name的UI组件都会**自动**发生变化，这是单向绑定。
 * mvvm框架还支持双向绑定：比如输入框绑定到info.name ，那么这个输入框的输入会自动修改info.name ，进而导致所有其它绑定到info.name 的UI组件都会自动发生变化。
+
+## 特点
+
+* 可以和任意UI库配合，ugui，ngui，fairyGUI，你自己倒腾的UI库。。。Whatever you want
+* 支持把本框架作为一个mvvm驱动器，纯用C#写逻辑
+* 支持“计算属性”：“计算属性”依赖的各属性发生改变会触发“计算属性”的重计算
+* 可随时绑定View以及解绑定
+
+## 两大特性
+
+* MVVM核心，单/双向绑定
+* 应用模块间配合框架【可选】：声明式加载，模块独立沙盒，数据隔离，模块间通过接口耦合
 
 ## 示例
 
@@ -81,6 +89,7 @@ public class Helloworld : MonoBehaviour
 * MoreComplex.unity: 演示混合使用lua，C#静态函数，C#成员函数作为事件响应，演示怎么监听一个数组的变化并应用到UI元素上。
 * NoLua.unity(Assets/XLua/Examples/03_UIEvent/): 演示不使用lua，把本框架作为一个mvvm驱动器，纯用C#写逻辑。
 * TestDetach.unity: 演示随意地挂载/卸载UI到一个ViewModel上。
+* App.unity: 演示应用模块间配合框架怎么使用。
 
 ## 怎么支持各种UI
 
