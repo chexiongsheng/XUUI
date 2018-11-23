@@ -21,30 +21,6 @@ local setfenv = setfenv or function(fn, env)
     return fn
 end
 
---options = {
---    data = {},
---    computed = {},
---    commands = {},
---}
-
-local app
-
-local function new(options)
-    if options.__type == 'app' then return app(options) end
-    options = options or {}
-    options.data = options.data or {}
-    options.computed = options.computed or {}
-    options.commands = options.commands or {}
-    
-    local observe = observeable.new(options.data)
-    
-    local function attach(el)
-        return binding.bind(options.data, observe, options.computed, options.commands, el)
-    end
-    
-    return attach
-end
-
 local function loadpackage(...)
     for _, loader in ipairs(package.searchers) do
         local func = loader(...)
@@ -72,30 +48,46 @@ local function loadmodule(options, exports, app_name, name)
     end
 end
 
-function app(config)
-    local app_name = assert(config.name, 'app name require')
-    local options = {
-        data = {},
-        computed = {},
-        commands = {},
-    }
+local function app_init(options)
+    local app_name = assert(options.name, 'app name require')
+    options.data =  {}
+    options.computed =  {}
+    options.commands = {}
     
     local exports = {}
     
-    for _, moduleName in ipairs(config.modules or {}) do
+    for _, moduleName in ipairs(options.modules or {}) do
         loadmodule(options, exports, app_name, moduleName)
     end
-    
-    return new(options)
+
 end
 
-_M.new = new
-_M.app = function(name, modules)
-    return {
-        __type = 'app',
-        name = name, 
-        modules = modules,
-    }
+--options = {
+--    data = {},
+--    computed = {},
+--    commands = {},
+--}
+
+local function new(options)
+    if options.__type == 'app' then
+        app_init(options)
+    end
+    
+    options = options or {}
+    options.data = options.data or {}
+    options.computed = options.computed or {}
+    options.commands = options.commands or {}
+    
+    local observe = observeable.new(options.data)
+    
+    local function attach(el)
+        return binding.bind(options.data, observe, options.computed, options.commands, el)
+    end
+    
+    return attach
 end
+
+
+_M.new = new
 
 return _M

@@ -33,7 +33,6 @@ namespace XUUI
 
             commandSetter = luaEnv.LoadString<Func<Action<LuaTable, string, object, string>>>(@"
                         return function(options, eventName, obj, methodName)
-                            options = options or {}
                             options.commands = options.commands or {}
                             local func = obj[methodName]
                             options.commands[eventName] = function(data)

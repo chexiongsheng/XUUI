@@ -56,8 +56,9 @@ local function watch_to(data, observe, el)
 end
 
 local function bind_action(data, commands, el)
-    local keys = parse_path(el.BindTo)
-    local func = assert(get_by_keys(commands, keys), 'invalid BindTo:' .. el.BindTo)
+    local bind_to = assert(el.BindTo, 'invalid BindTo:' .. el.BindTo)
+    local keys = parse_path(bind_to)
+    local func = assert(commands[bind_to] or get_by_keys(commands, keys), 'invalid BindTo:' .. bind_to)
     if #keys > 1 then
         table.remove(keys)
         data = assert(get_by_keys(data, keys), 'no data for ' .. el.BindTo)
@@ -66,6 +67,8 @@ local function bind_action(data, commands, el)
         func(data, ...)
     end
 end
+
+
 
 function _M.bind(data, observe, computed, commands, root)
     local bindings = collector.collect(root)

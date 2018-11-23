@@ -8,15 +8,24 @@ public class App : MonoBehaviour
     void Start()
     {
         context = new Context(@"
-            local xuui  = require 'xuui'
-            return xuui.app('myapp', {'module1', 'module2'})
+            return {
+                __type = 'app',
+                name  = 'myapp', 
+                modules = {'module1', 'module2'},
+           }
         ");
 
+        context.AddCommand("module2.cscmd", this, "CSCmd");
         context.Attach(gameObject);
     }
 
     void OnDestroy()
     {
         context.Dispose();
+    }
+
+    public void CSCmd(Interface2 data)
+    {
+        Debug.Log("data.select=" + data.select);
     }
 }
