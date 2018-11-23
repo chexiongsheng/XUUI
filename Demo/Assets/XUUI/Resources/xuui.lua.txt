@@ -64,8 +64,12 @@ local function loadmodule(options, exports, app_name, name)
     local m = func()
     exports[name] = m.exports
     options.data[name] = m.data
-    options.computed[name] = m.computed
     options.commands[name] = m.commands
+    if m.computed then
+        for k, v in pairs(m.computed) do
+            options.computed[string.format('%s.%s', name, k)] = v
+        end
+    end
 end
 
 function app(config)

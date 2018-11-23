@@ -11,6 +11,12 @@ return {
 			data.select = data.select == 0 and 1 or 0 -- command只能看到/修改自己的数据
 		end,
 	},
+    
+    computed = {
+        info = function(data)
+            return string.format('i am %s, my select is %d', data.name, data.select)
+        end,
+    },
 	
 	exports = {
 	    hello = function(p) -- 可以被其它module调用

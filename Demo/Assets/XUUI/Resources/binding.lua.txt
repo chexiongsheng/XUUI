@@ -4,6 +4,8 @@ local observeable = require 'observeable'
 local _M = {}
 
 local load = load or loadstring
+local parse_path = (require 'xuui_utils').parse_path
+local get_by_keys = (require 'xuui_utils').get_by_keys
 
 local function compile(str)
     local code = "return function(___data)\n"
@@ -18,6 +20,9 @@ local function listen_to(data, observe, computed, el, cbs)
     local is_computed = not not computed[bind_to]
     local is_computed_bind = not not (bind_to:find('$%.'))
     if is_computed or is_computed_bind then
+        if is_computed and bind_to:find('%.') then
+            data = data[bind_to:sub(1, bind_to:find("%.") - 1)]
+        end
         local associate = {}
         local get = is_computed_bind and compile(bind_to) or computed[bind_to]
         observe:read_report(function(path)
@@ -49,9 +54,6 @@ local function watch_to(data, observe, el)
         set(data, value)
     end
 end
-
-local parse_path = (require 'xuui_utils').parse_path
-local get_by_keys = (require 'xuui_utils').get_by_keys
 
 local function bind_action(data, commands, el)
     local keys = parse_path(el.BindTo)
