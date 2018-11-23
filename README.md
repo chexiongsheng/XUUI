@@ -6,11 +6,16 @@
 * 支持把本框架作为一个mvvm驱动器，纯用C#写逻辑
 * 支持“计算属性”：“计算属性”依赖的各属性发生改变会触发“计算属性”的重计算
 
+## 科普MVVM
+
+* mvvm框架，支持你在UI上设置一些绑定路径，比如：info.name ，select啥的，然后你在逻辑代码那修改info.name ，所有绑定到info.name的UI组件都会**自动**发生变化，这是单向绑定。
+* mvvm框架还支持双向绑定：比如输入框绑定到info.name ，那么这个输入框的输入会自动修改info.name ，进而导致所有其它绑定到info.name 的UI组件都会自动发生变化。
+
 ## 示例
 
 ### 设置绑定信息
 
-比如把一个输入框绑定到"info.name"，那么当info.name改变了会自动同步到该输入框，该输入修改后也会通知到各依赖info.name的其它节点。
+怎么操作？添加添加适配器（继承自MonoBehaviour）到GameObject，可以通过Component/XUUI菜单或者手动到XUUI\Scripts\UGUIAdapter目录找脚本拖放到GameObject，然后设置BindTo属性即可。
 
 Helloworld示例UI节点的绑定信息如下：
 
@@ -18,10 +23,6 @@ Helloworld示例UI节点的绑定信息如下：
 * Text      : message，这是个“计算属性”，其依赖于info.name以及select，当且仅当info.name以及select其中一个发生变化，会触发message重新计算（XUUI会自动计算依赖关系），并自动更新Text。
 * Dropdown  : select
 * Button    : reset，这会绑定到一个reset函数上
-
-绑定怎么操作？
-
-添加添加适配器（继承自MonoBehaviour）到GameObject，可以通过Component/XUUI菜单或者手动到XUUI\Scripts\UGUIAdapter目录找脚本拖放到GameObject，然后设置BindTo属性即可。
 
 ### 代码
 
