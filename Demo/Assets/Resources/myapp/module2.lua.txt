@@ -1,5 +1,5 @@
 local data = {
-    message = "module2",
+    message = "hehe",
     select = 1,
 }
 	

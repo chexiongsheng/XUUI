@@ -1,7 +1,7 @@
 
 return {
     data = {
-	    name = "module1", 
+	    name = "haha", 
 		select = 0, -- ui通过 module1.select来绑定
 	},
 	
