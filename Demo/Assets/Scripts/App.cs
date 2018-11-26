@@ -10,7 +10,7 @@ public class App : MonoBehaviour
         context = new Context(@"
             return {
                 name  = 'myapp', 
-                modules = {'module1', 'module2'}, -- 定义了modules就是开启模块隔离模式，module1模块将会以类似require 'myapp.module1'的方式加载
+                modules = {'module1', 'module2'}, -- 定义了modules就是使用app模式，module1模块将会以类似require 'myapp.module1'的方式加载
            }
         ");
 
