@@ -17,25 +17,34 @@ end
 
 local function listen_to(data, observe, computed, el, cbs)
     local bind_to = assert(el.BindTo, 'invalid BindTo:' .. el.BindTo)
+    local module_name
+    if bind_to:find('%.') then
+        module_name = bind_to:sub(1, bind_to:find("%.") - 1)
+    end
     local is_computed = not not computed[bind_to]
     local is_computed_bind = not not (bind_to:find('$%.'))
     if is_computed or is_computed_bind then
-        if is_computed and bind_to:find('%.') then
-            data = data[bind_to:sub(1, bind_to:find("%.") - 1)]
-        end
+        local tmpdata = (is_computed and module_name) and data[module_name] or data
         local associate = {}
         local get = is_computed_bind and compile(bind_to) or computed[bind_to]
         observe:read_report(function(path)
             table.insert(associate, path)
         end)
-        local value = observeable.raw(get(data))
+        local value = observeable.raw(get(tmpdata))
         observe:read_report()
         --print('computed', bind_to, value)
         el.Value = value
         for _, path in ipairs(associate) do
-            local cb = observe:watch(path, function()
-                el.Value = observeable.raw(get(data))
-            end)
+            local cb
+            if (not module_name) or is_computed_bind then -- 获取的都是全局的
+                cb = observe:watch(path, function()
+                    el.Value = observeable.raw(get(data))
+                end)
+            else -- module_name and not is_computed_bind
+                cb = observe:watch(path, function()
+                    el.Value = observeable.raw(computed[bind_to](data[module_name]))
+                end)
+            end
             table.insert(cbs, cb)
         end
     else
@@ -57,14 +66,19 @@ end
 
 local function bind_action(data, commands, el)
     local bind_to = assert(el.BindTo, 'invalid BindTo:' .. el.BindTo)
-    local keys = parse_path(bind_to)
-    local func = assert(commands[bind_to] or get_by_keys(commands, keys), 'invalid BindTo:' .. bind_to)
-    if #keys > 1 then
-        table.remove(keys)
-        data = assert(get_by_keys(data, keys), 'no data for ' .. el.BindTo)
+    local module_name
+    if bind_to:find('%.') then
+        module_name = bind_to:sub(1, bind_to:find("%.") - 1)
     end
-    el.OnAction = function(...)
-        func(data, ...)
+    local func = assert(commands[bind_to], 'invalid BindTo:' .. bind_to)
+    if module_name then
+        el.OnAction = function(...)
+            commands[bind_to](data[module_name], ...)
+        end
+    else
+        el.OnAction = function(...)
+            func(data, ...)
+        end
     end
 end
 

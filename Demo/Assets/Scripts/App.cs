@@ -15,6 +15,8 @@ public class App : MonoBehaviour
         ");
 
         context.AddCommand("module2.cscmd", this, "CSCmd");
+        context.AddCommand("reload_module1", this, "ReloadModule1");
+        context.AddCommand("reload_module2", this, "ReloadModule2");
         context.Attach(gameObject);
     }
 
@@ -26,5 +28,15 @@ public class App : MonoBehaviour
     public void CSCmd(Interface2 data)
     {
         Debug.Log("data.select=" + data.select);
+    }
+
+    public void ReloadModule1()
+    {
+        context.ReloadModule("module1");
+    }
+
+    public void ReloadModule2()
+    {
+        context.ReloadModule("module2");
     }
 }

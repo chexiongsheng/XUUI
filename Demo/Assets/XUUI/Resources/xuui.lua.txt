@@ -40,7 +40,11 @@ local function loadmodule(options, exports, app_name, name)
     local m = func()
     exports[name] = m.exports
     options.data[name] = m.data
-    options.commands[name] = m.commands
+    if m.commands then
+        for k, v in pairs(m.commands) do
+            options.commands[string.format('%s.%s', name, k)] = v
+        end
+    end
     if m.computed then
         for k, v in pairs(m.computed) do
             options.computed[string.format('%s.%s', name, k)] = v
@@ -48,18 +52,12 @@ local function loadmodule(options, exports, app_name, name)
     end
 end
 
-local function app_init(options)
+local function app_init(options, exports)
     local app_name = assert(options.name, 'app name require')
-    options.data =  {}
-    options.computed =  {}
-    options.commands = {}
     
-    local exports = {}
-    
-    for _, moduleName in ipairs(options.modules or {}) do
-        loadmodule(options, exports, app_name, moduleName)
+    for _, module_name in ipairs(options.modules or {}) do
+        loadmodule(options, exports, app_name, module_name)
     end
-
 end
 
 --options = {
@@ -69,22 +67,27 @@ end
 --}
 
 local function new(options)
-    if options.modules then
-        app_init(options)
-    end
-    
     options = options or {}
     options.data = options.data or {}
     options.computed = options.computed or {}
     options.commands = options.commands or {}
     
+    local exports = {}
+    if options.modules then
+        app_init(options, exports)
+    end
+
     local observe = observeable.new(options.data)
     
     local function attach(el)
         return binding.bind(options.data, observe, options.computed, options.commands, el)
     end
     
-    return attach
+    local function reload(module_name)
+        loadmodule(options, exports, options.name, module_name)
+    end
+    
+    return attach, reload
 end
 
 

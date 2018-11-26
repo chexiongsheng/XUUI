@@ -5,11 +5,12 @@ using System;
 
 namespace XUUI
 {
+    public delegate void ContextCreator(LuaTable options, out Func<GameObject, Action> attach, out Action<string> reload);
     public class Context : IDisposable
     {
         LuaEnv luaEnv = null;
 
-        Func<LuaTable, Func<GameObject, Action>> creator = null;
+        ContextCreator creator = null;
 
         Action<LuaTable, string, object, string> commandSetter = null;
 
@@ -27,7 +28,7 @@ namespace XUUI
                 luaEnv = env;
             }
 
-            creator = luaEnv.LoadString<Func<Func<LuaTable, Func<GameObject, Action>>>>(@"
+            creator = luaEnv.LoadString<Func<ContextCreator>>(@"
                         return (require 'xuui').new
                     ", "@xuui_init.lua")();
 
@@ -44,6 +45,7 @@ namespace XUUI
 
 
         Func<GameObject, Action> attach;
+        Action<string> reload;
 
         public Func<LuaTable> Compile(string script)
         {
@@ -73,7 +75,7 @@ namespace XUUI
         void init(LuaTable options)
         {
             this.options = options;
-            attach = creator(options);
+            creator(options, out attach, out reload);
         }
 
         Dictionary<GameObject, Action> detachs = new Dictionary<GameObject, Action>();
@@ -106,6 +108,11 @@ namespace XUUI
             }
         }
 
+        public void ReloadModule(string moduleName)
+        {
+            reload(moduleName);
+        }
+
         public void AddCommand(string commandName, object obj, string methodName)
         {
             commandSetter(options, commandName, obj, methodName);
@@ -121,6 +128,7 @@ namespace XUUI
             detachs = null;
             options = null;
             attach = null;
+            reload = null;
 
             creator = null;
             commandSetter = null;
