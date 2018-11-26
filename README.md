@@ -1,6 +1,11 @@
 # XUUI
 
-一个采用lua（基于xLua）实现的mvvm框架。
+基于xLua的轻量级UI框架。
+
+## XUUI两大核心特性
+
+* 支持MVVM的单/双向绑定
+* 应用框架：声明式加载，模块独立沙盒，数据隔离，模块间通过接口耦合
 
 ## 科普MVVM
 
@@ -13,11 +18,6 @@
 * 支持把本框架作为一个mvvm驱动器，纯用C#写逻辑
 * 支持“计算属性”：“计算属性”依赖的各属性发生改变会触发“计算属性”的重计算
 * 可随时绑定View以及解绑定
-
-## 两大特性
-
-* MVVM核心，单/双向绑定
-* 应用模块间配合框架【可选】：声明式加载，模块独立沙盒，数据隔离，模块间通过接口耦合
 
 ## 示例
 
@@ -83,13 +83,19 @@ public class Helloworld : MonoBehaviour
 
 然后就可以愉快的Attach到某个UI根节点了（可以Attach多个），这个UI跟节点设置了绑定信息的UI元素都会自动同步。
 
+## 应用框架
+
+Helloworld例子展现的是类似vue.js的能力，实际项目中，更建议以模块的方式来组织程序。XUUI提供的应用框架，能很好的实现模块间隔离，也能提供模块间的可控交互能力。
+
+详细请看[这篇文档](Docs/App.md)以及配套的实例程序。
+
 ## 例子说明
 
 * Helloworld.unity: 快速入门的例子。
 * MoreComplex.unity: 演示混合使用lua，C#静态函数，C#成员函数作为事件响应，演示怎么监听一个数组的变化并应用到UI元素上。
 * NoLua.unity(Assets/XLua/Examples/03_UIEvent/): 演示不使用lua，把本框架作为一个mvvm驱动器，纯用C#写逻辑。
 * TestDetach.unity: 演示随意地挂载/卸载UI到一个ViewModel上。
-* App.unity: 演示应用模块间配合框架怎么使用。
+* App.unity: 演示应用框架怎么使用。
 
 ## 怎么支持各种UI
 
