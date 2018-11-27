@@ -33,28 +33,28 @@ module1代码
 ~~~lua
 return {
     data = {
-	    name = "haha", 
-		select = 0, -- ui通过 module1.select来绑定
-	},
-	
-	commands = {
-		click = function(data)
-		    module2.set_select(data.select) -- 可以调用别的模块exports的接口
-			data.select = data.select == 0 and 1 or 0 -- command只能看到/修改自己的数据
-		end,
-	},
+        name = "haha", 
+        select = 0, -- ui通过 module1.select来绑定
+    },
+    
+    commands = {
+        click = function(data)
+            module2.set_select(data.select) -- 可以调用别的模块exports的接口
+            data.select = data.select == 0 and 1 or 0 -- command只能看到/修改自己的数据
+        end,
+    },
     
     computed = {
         info = function(data)
             return string.format('i am %s, my select is %d', data.name, data.select)
         end,
     },
-	
-	exports = {
-	    hello = function(p) -- 可以被其它module调用
-		    print('hello, p = '.. p)
-		end,
-	},
+    
+    exports = {
+        hello = function(p) -- 可以被其它module调用
+            print('hello, p = '.. p)
+        end,
+    },
 }
 ~~~
 
@@ -65,28 +65,28 @@ local data = {
     message = "hehe",
     select = 1,
 }
-	
+    
 return {
     data = data,
-	
-	commands = {
-		click = function(data)
-		    module1.hello(1)
-			data.select = data.select == 0 and 1 or 0
-		end,
-	},
+    
+    commands = {
+        click = function(data)
+            module1.hello(1)
+            data.select = data.select == 0 and 1 or 0
+        end,
+    },
     
     computed = {
         info = function(data)
             return string.format('message is %s, select is %d', data.message, data.select)
         end,
     },
-	
-	exports = {
-	    set_select = function(p)
-		    data.select = p
-		end,
-	},
+    
+    exports = {
+        set_select = function(p)
+            data.select = p
+        end,
+    },
 }
 ~~~
 
