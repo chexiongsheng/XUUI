@@ -16,7 +16,7 @@ local function gen_set_callback(callback_info, field_path)
     return function()
         local callbacks = callback_info[field_path]
         if not callbacks then return end
-        for _, callback in ipairs(callbacks) do
+        for callback in pairs(callbacks) do
             callback()
         end
     end
@@ -110,7 +110,7 @@ local function new(data)
     local callback_info = {}
     observeable_init(data, data, "", callback_info)
     return {
-        watch = function(self, path, callback) -- TODO: 去重
+        watch = function(self, path, callback)
             local keys = parse_path(path)
             init_dir(data, keys)
             local function get(obj)
@@ -136,22 +136,14 @@ local function new(data)
             for _, key in ipairs(keys) do
                 pp = append_key(pp, key)
                 callback_info[pp] = callback_info[pp] or {}
-                insert(callback_info[pp], real_callback)
+                callback_info[pp][real_callback] = true
             end
             
             return real_callback
         end,
         unwatch = function(self, real_callback)
             for _, cbs in pairs(callback_info) do
-                local rm = {}
-                for i, cb in ipairs(cbs) do
-                    if cb == real_callback then
-                        table.insert(rm, 1, i)
-                    end
-                end
-                for _, pos in ipairs(rm) do
-                    table.remove(cbs, pos)
-                end
+                cbs[real_callback] = nil
             end
         end,
         setter = function(self, path)
