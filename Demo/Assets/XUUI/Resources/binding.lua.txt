@@ -15,7 +15,7 @@ local function compile(str)
     return load(code)()
 end
 
-local function listen_to(data, observe, computed, el, cbs)
+local function listen_to(data, observe, computed, el, cbs, ccbs)
     local bind_to = assert(el.BindTo, 'invalid BindTo:' .. el.BindTo)
     local module_name
     if bind_to:find('%.') then
@@ -44,6 +44,11 @@ local function listen_to(data, observe, computed, el, cbs)
             updater = function()
                 el.Value = observeable.raw(computed[bind_to](data[module_name]))
             end
+            -- computed change update
+            table.insert(ccbs, updater)
+            local computed_watchs = computed[0]
+            computed_watchs[bind_to] = computed_watchs[bind_to] or {}
+            computed_watchs[bind_to][updater] = true
         end
             
         for _, path in ipairs(associate) do
@@ -89,8 +94,9 @@ end
 function _M.bind(data, observe, computed, commands, root)
     local bindings = collector.collect(root)
     local cbs = {}
+    local ccbs = {}
     for _, obj in ipairs(bindings[1]) do
-        listen_to(data, observe, computed, obj, cbs)
+        listen_to(data, observe, computed, obj, cbs, ccbs)
     end
     
     for _, obj in ipairs(bindings[2]) do
@@ -110,6 +116,10 @@ function _M.bind(data, observe, computed, commands, root)
         end
         for _, obj in ipairs(bindings[3]) do
             obj.OnAction = nil
+        end
+        local computed_watchs = computed[0]
+        for _, ccb in ipairs(ccbs) do
+            computed_watchs[ccb] = nil
         end
     end
     return detach
