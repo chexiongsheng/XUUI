@@ -34,18 +34,20 @@ local function listen_to(data, observe, computed, el, cbs)
         observe:read_report()
         --print('computed', bind_to, value)
         el.Value = value
-        for _, path in ipairs(associate) do
-            local cb
-            if (not module_name) or is_computed_bind then -- 获取的都是全局的
-                cb = observe:watch(path, function()
-                    el.Value = observeable.raw(get(data))
-                end)
-            else -- module_name and not is_computed_bind
-                cb = observe:watch(path, function()
-                    el.Value = observeable.raw(computed[bind_to](data[module_name]))
-                end)
+        
+        local updater
+        if (not module_name) or is_computed_bind then -- 获取的都是全局的
+            updater = function()
+                el.Value = observeable.raw(get(data))
             end
-            table.insert(cbs, cb)
+        else -- module_name and not is_computed_bind
+            updater = function()
+                el.Value = observeable.raw(computed[bind_to](data[module_name]))
+            end
+        end
+            
+        for _, path in ipairs(associate) do
+            table.insert(cbs, observe:watch(path, updater))
         end
     else
         el.Value = observeable.raw(observe:getter(bind_to)(data))
