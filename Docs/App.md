@@ -26,6 +26,7 @@ context = new Context(@"
 * 为这两个设置独立的沙盒，各模块即使定义了全局变量也互不影响，一定程度上减轻不同模块开发者由于沟通不足或者笔误引发的模块间冲突
 * 模块间数据隔离：模块也可以定义data、commands、computed，在模块定义的commands和computed只能看到本模块的data
 * 模块间调用：通过exports字段可以导出一些函数供其它模块调用，其它模块可以通过“模块名.函数名”调用
+* 支持模块刷新（reload），reload后data变动会更新UI，监听原先commands也会自动更新到新的commands，computed会自动重新计算并更新UI
 
 module1代码
 
