@@ -32,8 +32,6 @@ public class MoreComplex : MonoBehaviour
             }
         ");
 
-        context.AddCommand("instance_csharp_callback", new SomeClass(1024), "Bar");
-
         context.Attach(gameObject);
     }
 

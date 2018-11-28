@@ -23,7 +23,7 @@ namespace XUUI
 
         ContextCreator creator = null;
 
-        Action<LuaTable, string, object, string> commandSetter = null;
+        Action<LuaTable, string, string, object> commandSetter = null;
         Action<LuaTable, string, string, object> exportSetter = null;
 
         bool disposeLuaEnv = false;
@@ -44,18 +44,20 @@ namespace XUUI
                         return (require 'xuui').new
                     ", "@xuui_init.lua")();
 
-            commandSetter = luaEnv.LoadString<Func<Action<LuaTable, string, object, string>>>(@"
-                        return function(options, eventName, obj, methodName)
+            commandSetter = luaEnv.LoadString<Func<Action<LuaTable, string, string, object>>>(@"
+                        return function(options, module_name, method_name, obj)
+                            options.data[module_name] = options.data[module_name] or {}
                             options.commands = options.commands or {}
-                            local func = obj[methodName]
-                            options.commands[eventName] = function(data)
-                                func(obj, data)
+                            local func = obj[method_name]
+                            options.commands[string.format('%s.%s', module_name, method_name)] = function(...)
+                                func(obj, ...)
                             end
                         end
                     ", "@eventSetter.lua")();
 
             exportSetter = luaEnv.LoadString<Func<Action<LuaTable, string, string, object>>>(@"
                         return function(options, module_name, method_name, obj)
+                            options.data[module_name] = options.data[module_name] or {}
                             options.exports[module_name] = options.exports[module_name] or {}
                             local func = obj[method_name]
                             options.exports[module_name][method_name] = function(...)
@@ -135,17 +137,12 @@ namespace XUUI
             reload(moduleName, reloadData);
         }
 
-        public void AddCommand(string commandName, object obj, string methodName)
-        {
-            commandSetter(options, commandName, obj, methodName);
-        }
-
         public void AddCSharpModule(string moduleName, object module)
         {
             var all = module.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
             foreach(var cmd in all.Where(m => m.IsDefined(typeof(CommandAttribute), false)))
             {
-                commandSetter(options, string.Format("{0}.{1}", moduleName, cmd.Name) , module, cmd.Name);
+                commandSetter(options, moduleName, cmd.Name, module);
             }
             foreach (var export in all.Where(m => m.IsDefined(typeof(ExportAttribute), false)))
             {

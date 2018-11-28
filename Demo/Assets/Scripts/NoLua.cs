@@ -8,17 +8,18 @@ public class NoLua : MonoBehaviour
     void Start()
     {
         context = new Context();
-        context.AddCommand("Foo", this, "Foo");
-        context.AddCommand("Bar", this, "Bar");
+        context.AddCSharpModule("NoLua", this);
         context.Attach(gameObject);
     }
 
+    [Command]
     public void Foo(Interface1 data)
     {
         Debug.Log(string.Format("NoLua.Foo, got name: {0}", data.name));
         data.name = "Foo";
     }
 
+    [Command]
     public void Bar(Interface2 data)
     {
         Debug.Log(string.Format("NoLua.Foo, got select : {0}", data.select));

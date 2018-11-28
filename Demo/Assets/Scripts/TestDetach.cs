@@ -35,12 +35,7 @@ public class TestDetach : MonoBehaviour
             }
         ");
 
-        context.AddCommand("instance_csharp_callback", new SomeClass(1024), "Bar");
-        context.AddCommand("attachleft", this, "AttachLeft");
-        context.AddCommand("detachleft", this, "DetachLeft");
-        context.AddCommand("attachright", this, "AttachRight");
-        context.AddCommand("detachright", this, "DetachRight");
-
+        context.AddCSharpModule("ViewMgr", this);
 
         var control = GameObject.Find("PanelControl");
         panelLeft = GameObject.Find("PanelLeft");
@@ -49,21 +44,25 @@ public class TestDetach : MonoBehaviour
         context.Attach(control);
     }
 
+    [Command]
     public void AttachLeft()
     {
         context.Attach(panelLeft);
     }
 
+    [Command]
     public void DetachLeft()
     {
         context.Detach(panelLeft);
     }
 
+    [Command]
     public void AttachRight()
     {
         context.Attach(panelRight);
     }
 
+    [Command]
     public void DetachRight()
     {
         context.Detach(panelRight);
