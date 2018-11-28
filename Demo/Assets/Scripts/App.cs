@@ -14,9 +14,7 @@ public class App : MonoBehaviour
            }
         ");
 
-        context.AddCommand("module2.cscmd", this, "CSCmd");
-        context.AddCommand("reload_module1", this, "ReloadModule1");
-        context.AddCommand("reload_module2", this, "ReloadModule2");
+        context.AddCSharpModule("ModuleManager", this);
         context.Attach(gameObject);
     }
 
@@ -25,16 +23,19 @@ public class App : MonoBehaviour
         context.Dispose();
     }
 
-    public void CSCmd(Interface2 data)
+    [Export]
+    public void HelloCSharp(Interface2 data, int p)
     {
-        Debug.Log("data.select=" + data.select);
+        Debug.Log("data.select=" + data.select + ", p=" + p);
     }
 
+    [Command]
     public void ReloadModule1()
     {
         context.ReloadModule("module1");
     }
 
+    [Command]
     public void ReloadModule2()
     {
         context.ReloadModule("module2");

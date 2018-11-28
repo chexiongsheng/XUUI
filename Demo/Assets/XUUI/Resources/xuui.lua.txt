@@ -62,11 +62,11 @@ local function loadmodule(options, exports, app_name, name, do_not_load_data)
     end
 end
 
-local function app_init(options, exports)
+local function app_init(options)
     local app_name = assert(options.name, 'app name require')
     
     for _, module_name in ipairs(options.modules or {}) do
-        loadmodule(options, exports, app_name, module_name)
+        loadmodule(options, options.exports, app_name, module_name)
     end
 end
 
@@ -82,10 +82,10 @@ local function new(options)
     options.computed = options.computed or {}
     options.computed[0] = {}
     options.commands = options.commands or {}
+    options.exports = {}
     
-    local exports = {}
     if options.modules then
-        app_init(options, exports)
+        app_init(options)
     end
 
     local observe = observeable.new(options.data)
@@ -95,7 +95,7 @@ local function new(options)
     end
     
     local function reload(module_name, reload_data)
-        loadmodule(options, exports, options.name, module_name, not reload_data)
+        loadmodule(options, options.exports, options.name, module_name, not reload_data)
     end
     
     return attach, reload

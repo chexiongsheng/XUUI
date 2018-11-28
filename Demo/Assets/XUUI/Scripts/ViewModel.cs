@@ -2,10 +2,21 @@
 using System.Collections.Generic;
 using XLua;
 using System;
+using System.Reflection;
+using System.Linq;
 
 namespace XUUI
 {
+    public class CommandAttribute : Attribute
+    {
+    }
+
+    public class ExportAttribute : Attribute
+    {
+    }
+
     public delegate void ContextCreator(LuaTable options, out Func<GameObject, Action> attach, out Action<string, bool> reload);
+
     public class Context : IDisposable
     {
         LuaEnv luaEnv = null;
@@ -13,6 +24,7 @@ namespace XUUI
         ContextCreator creator = null;
 
         Action<LuaTable, string, object, string> commandSetter = null;
+        Action<LuaTable, string, string, object> exportSetter = null;
 
         bool disposeLuaEnv = false;
 
@@ -41,6 +53,16 @@ namespace XUUI
                             end
                         end
                     ", "@eventSetter.lua")();
+
+            exportSetter = luaEnv.LoadString<Func<Action<LuaTable, string, string, object>>>(@"
+                        return function(options, module_name, method_name, obj)
+                            options.exports[module_name] = options.exports[module_name] or {}
+                            local func = obj[method_name]
+                            options.exports[module_name][method_name] = function(...)
+                                func(obj, ...)
+                            end
+                        end
+                    ", "@exportSetter.lua")();
         }
 
 
@@ -118,6 +140,19 @@ namespace XUUI
             commandSetter(options, commandName, obj, methodName);
         }
 
+        public void AddCSharpModule(string moduleName, object module)
+        {
+            var all = module.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            foreach(var cmd in all.Where(m => m.IsDefined(typeof(CommandAttribute), false)))
+            {
+                commandSetter(options, string.Format("{0}.{1}", moduleName, cmd.Name) , module, cmd.Name);
+            }
+            foreach (var export in all.Where(m => m.IsDefined(typeof(ExportAttribute), false)))
+            {
+                exportSetter(options, moduleName, export.Name, module);
+            }
+        }
+
         void clearLuaRef()
         {
             foreach (var kv in detachs)
@@ -132,6 +167,7 @@ namespace XUUI
 
             creator = null;
             commandSetter = null;
+            exportSetter = null;
         }
 
         public void Dispose()

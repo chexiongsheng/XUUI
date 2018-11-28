@@ -11,6 +11,10 @@ return {
             module1.hello(1)
             data.select = data.select == 0 and 1 or 0
         end,
+        
+        say_hello_to_csharp = function(data)
+            ModuleManager.HelloCSharp(data, 1024)
+        end,
     },
     
     computed = {
