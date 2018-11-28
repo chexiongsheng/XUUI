@@ -8,24 +8,20 @@ public class Helloworld : MonoBehaviour
     void Start()
     {
         context = new Context(@"
-            local select_info = {'vegetables', 'meat'}
-
             return {
                 data = {
                     info = {
-                        name = 'john',
+                        name = 'John',
                     },
-                    select = 0,
                 },
                 computed = {
                     message = function(data)
-                        return 'Hello ' .. data.info.name .. ', your choice is ' .. tostring(select_info[data.select + 1])
+                        return 'Hello ' .. data.info.name .. '!'
                     end
                 },
                 commands = {
-                    reset = function(data)
-                        data.info.name = 'john'
-                        data.select = 0
+                    click = function(data)
+                        print(data.info.name)
                     end,
                 },
             }

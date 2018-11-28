@@ -28,9 +28,8 @@
 Helloworld示例UI节点的绑定信息如下：
 
 * InputField: info.name
-* Text      : message，这是个“计算属性”，其依赖于info.name以及select，当且仅当info.name以及select其中一个发生变化，会触发message重新计算（XUUI会自动计算依赖关系），并自动更新Text。
-* Dropdown  : select
-* Button    : reset，这会绑定到一个reset函数上
+* Text      : message，这是个“计算属性”，计算时用了info.name，当info.name发生变化会触发message重新计算，并自动更新Text。
+* Button    : click，这会绑定到一个click command上
 
 ### 代码
 
@@ -42,24 +41,20 @@ public class Helloworld : MonoBehaviour
     void Start()
     {
         context = new Context(@"
-            local select_info = {'vegetables', 'meat'}
-
             return {
                 data = {
                     info = {
-                        name = 'john',
+                        name = 'John',
                     },
-                    select = 0,
                 },
                 computed = {
                     message = function(data)
-                        return 'Hello ' .. data.info.name .. ', your choice is ' .. tostring(select_info[data.select + 1])
+                        return 'Hello ' .. data.info.name .. '!'
                     end
                 },
                 commands = {
-                    reset = function(data)
-                        data.info.name = 'john'
-                        data.select = 0
+                    click = function(data)
+                        print(data.info.name)
                     end,
                 },
             }
@@ -75,7 +70,7 @@ public class Helloworld : MonoBehaviour
 }
 ~~~
 
-根据一个lua脚本去new一个ViewModel，该脚本仅简单的返回一个table，该table各字段含义如下：
+根据一个lua脚本去new一个Context，该脚本仅简单的返回一个table，该table各字段含义如下：
 
 * data就是ViewModle（VM）
 * computed中引用到的VM元素，在其依赖的VM元素发生改变会自动重新计算并同步到各个绑定了它（比如上例的message）的节点
