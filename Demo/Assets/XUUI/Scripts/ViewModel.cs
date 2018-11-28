@@ -5,7 +5,7 @@ using System;
 
 namespace XUUI
 {
-    public delegate void ContextCreator(LuaTable options, out Func<GameObject, Action> attach, out Action<string> reload);
+    public delegate void ContextCreator(LuaTable options, out Func<GameObject, Action> attach, out Action<string, bool> reload);
     public class Context : IDisposable
     {
         LuaEnv luaEnv = null;
@@ -45,7 +45,7 @@ namespace XUUI
 
 
         Func<GameObject, Action> attach;
-        Action<string> reload;
+        Action<string, bool> reload;
 
         public Func<LuaTable> Compile(string script)
         {
@@ -108,9 +108,9 @@ namespace XUUI
             }
         }
 
-        public void ReloadModule(string moduleName)
+        public void ReloadModule(string moduleName, bool reloadData = false)
         {
-            reload(moduleName);
+            reload(moduleName, reloadData);
         }
 
         public void AddCommand(string commandName, object obj, string methodName)

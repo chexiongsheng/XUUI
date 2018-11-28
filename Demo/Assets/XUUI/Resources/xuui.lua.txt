@@ -30,7 +30,7 @@ local function loadpackage(...)
     end
 end
 
-local function loadmodule(options, exports, app_name, name)
+local function loadmodule(options, exports, app_name, name, do_not_load_data)
     local func = assert(loadpackage(string.format('%s.%s', app_name, name)), 'can not load module:' .. name)
     setfenv(func, setmetatable({}, {
         __index = function(t, k)
@@ -39,7 +39,9 @@ local function loadmodule(options, exports, app_name, name)
     }))
     local m = func()
     exports[name] = m.exports
-    options.data[name] = m.data
+    if not do_not_load_data then 
+        options.data[name] = m.data
+    end
     if m.commands then
         for k, v in pairs(m.commands) do
             options.commands[string.format('%s.%s', name, k)] = v
@@ -92,8 +94,8 @@ local function new(options)
         return binding.bind(options.data, observe, options.computed, options.commands, el)
     end
     
-    local function reload(module_name)
-        loadmodule(options, exports, options.name, module_name)
+    local function reload(module_name, reload_data)
+        loadmodule(options, exports, options.name, module_name, not reload_data)
     end
     
     return attach, reload

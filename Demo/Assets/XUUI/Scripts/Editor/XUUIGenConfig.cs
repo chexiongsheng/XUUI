@@ -16,6 +16,7 @@ namespace XUUI.UGUIAdapter
             typeof(Action<LuaTable, string, object, string>),
             typeof(Func<Action<LuaTable, string, object, string>>),
             typeof(ContextCreator),
+            typeof(Action<string, bool>),
         };
     }
 }
