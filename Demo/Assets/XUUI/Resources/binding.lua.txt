@@ -4,16 +4,8 @@ local observeable = require 'observeable'
 local _M = {}
 
 local load = load or loadstring
-local parse_path = (require 'xuui_utils').parse_path
-local get_by_keys = (require 'xuui_utils').get_by_keys
-
-local function compile(str)
-    local code = "return function(___data)\n"
-                 .. "return "
-                 .. str:gsub("$%.", "___data.")
-                 .. "\nend"
-    return load(code)()
-end
+local is_template = (require 'xuui_utils').is_template
+local compile_template = (require 'xuui_utils').compile_template
 
 local function listen_to(data, observe, computed, el, cbs, ccbs)
     local bind_to = assert(el.BindTo, 'invalid BindTo:' .. el.BindTo)
@@ -22,7 +14,7 @@ local function listen_to(data, observe, computed, el, cbs, ccbs)
         module_name = bind_to:sub(1, bind_to:find("%.") - 1)
     end
     local is_computed = not not computed[bind_to]
-    local is_computed_bind = not not (bind_to:find('$%.'))
+    local is_computed_bind = is_template(bind_to)
     if is_computed or is_computed_bind then
         local watched = {}
         local to_watch = {}
@@ -37,7 +29,7 @@ local function listen_to(data, observe, computed, el, cbs, ccbs)
         local compiled
         
         if is_computed_bind then
-            compiled = compile(bind_to)
+            compiled = compile_template(bind_to)
         end
         
         local function set_and_watch()

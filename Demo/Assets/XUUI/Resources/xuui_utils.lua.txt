@@ -38,7 +38,57 @@ local function get_by_keys(data, keys)
     return data
 end
 
+local function parse_expression(result, chunk)
+  local i, n = 1, #chunk
+  while i <= n do
+    local s, e, expr = find(chunk, "$(%b{})", i)
+    if not s or s > i then
+      insert(result, format("_put(%q)", sub(chunk, i, s and s - 1)))
+    end
+    if not s then break end
+    insert(result, format("_put(%s)", sub(expr, 2, -2)))
+    i = e + 1
+  end
+end
+
+local load = loadstring or load
+local concat, insert, tostring = table.concat, table.insert, tostring
+
+local do_render
+if setfenv and not math.type then -- lua5.1
+    function do_render(render, env, _put)
+        setfenv(render, env)
+        local status, err = pcall(render, _put)
+        if not status then return error(err) end
+    end
+else
+    function do_render(render, env, _put)
+        local status, err = pcall(render, _put, env)
+        if not status then return error(err) end
+    end
+end
+
+local function compile_template(s)
+    local result = {"local _put, _ENV = ..."}
+    parse_expression(result, s)
+    local render, err = load(concat(result), "string_template")
+    if not render then return error(err) end
+    return function(env)
+        local t = {}
+        do_render(render, env, function(s)
+            if s ~= nil then insert(t, tostring(s)) end
+        end)
+        return concat(t)
+    end
+end
+
+local function is_template(s)
+    return find(s, "$%b{}")
+end
+
 return {
     parse_path = parse_path,
     get_by_keys = get_by_keys,
+    compile_template = compile_template,
+    is_template = is_template,
 }
