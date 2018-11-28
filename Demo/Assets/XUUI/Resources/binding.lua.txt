@@ -24,36 +24,47 @@ local function listen_to(data, observe, computed, el, cbs, ccbs)
     local is_computed = not not computed[bind_to]
     local is_computed_bind = not not (bind_to:find('$%.'))
     if is_computed or is_computed_bind then
-        local tmpdata = (is_computed and module_name) and data[module_name] or data
-        local associate = {}
-        local get = is_computed_bind and compile(bind_to) or computed[bind_to]
-        observe:read_report(function(path)
-            table.insert(associate, path)
-        end)
-        local value = observeable.raw(get(tmpdata))
-        observe:read_report()
-        --print('computed', bind_to, value)
-        el.Value = value
+        local watched = {}
+        local to_watch = {}
         
-        local updater
-        if (not module_name) or is_computed_bind then -- 获取的都是全局的
-            updater = function()
-                el.Value = observeable.raw(get(data))
+        local function read_watch(path)
+            if not watched[path] then
+                table.insert(to_watch, path)
+                watched[path] = true
             end
-        else -- module_name and not is_computed_bind
-            updater = function()
-                el.Value = observeable.raw(computed[bind_to](data[module_name]))
+        end
+        
+        local compiled
+        
+        if is_computed_bind then
+            compiled = compile(bind_to)
+        end
+        
+        local function set_and_watch()
+            local tmpdata = (is_computed and module_name) and data[module_name] or data
+            local get = is_computed_bind and compiled or computed[bind_to]
+            observe:read_report(read_watch)
+            local value = observeable.raw(get(tmpdata))
+            observe:read_report()
+            --print('computed', bind_to, value)
+            el.Value = value
+            
+            if #to_watch > 0 then
+                for _, path in ipairs(to_watch) do
+                    table.insert(cbs, observe:watch(path, set_and_watch))
+                end
+                to_watch = {}
             end
-            -- computed change update
-            table.insert(ccbs, updater)
+        end
+        
+        if module_name and not is_computed_bind then
+            table.insert(ccbs, set_and_watch)
             local computed_watchs = computed[0]
             computed_watchs[bind_to] = computed_watchs[bind_to] or {}
-            computed_watchs[bind_to][updater] = true
+            computed_watchs[bind_to][set_and_watch] = true
         end
-            
-        for _, path in ipairs(associate) do
-            table.insert(cbs, observe:watch(path, updater))
-        end
+        
+        set_and_watch()
     else
         el.Value = observeable.raw(observe:getter(bind_to)(data))
         local cb = observe:watch(bind_to, function(_, value, old)
