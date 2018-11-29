@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using XLua;
+using UnityEngine.UI;
 
 namespace XUUI.UGUIAdapter
 {
@@ -15,6 +16,15 @@ namespace XUUI.UGUIAdapter
             typeof(DropdownAdapter),
             typeof(ButtonAdapter),
             typeof(DropdownOptionsAdapter),
+            typeof(AdapterBase<Text>),
+            typeof(AdapterBase<InputField>),
+            typeof(AdapterBase<Dropdown>),
+            typeof(AdapterBase<Button>),
+            typeof(RawAdapterBase),
+            typeof(RawTextAdapter),
+            typeof(RawInputFieldAdapter),
+            typeof(RawDropdownAdapter),
+            typeof(RawButtonAdapter),
         };
 
         [CSharpCallLua]
