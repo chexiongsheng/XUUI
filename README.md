@@ -82,7 +82,7 @@ public class Helloworld : MonoBehaviour
 
 Helloworld例子展现的是类似vue.js的能力，实际项目中，更建议以模块的方式来组织程序。XUUI提供的应用框架，能很好的实现模块间隔离，也能提供模块间的可控交互能力。
 
-详细请看[这篇文档](Docs/App.md)以及配套的实例程序。
+详细请看[《应用框架》](Docs/App.md)以及配套的实例程序。
 
 ## 例子说明
 
@@ -94,112 +94,5 @@ Helloworld例子展现的是类似vue.js的能力，实际项目中，更建议�
 
 ## 怎么支持各种UI
 
-本框架设计上就避免和具体某个UI库耦合，通过实现一套Adapter以及一个AdapterCollector，即可和任意UI库配合。
-
-### Adapter实现
-
-以UGUI为例，划重点：
-
-* 继承AdapterBase<要适配的UI类>
-* 如果其需要监听VM变化，须实现DataConsumer接口（可以不显式声明实现，只要有DataConsumer声明的接口即可）
-* 如果其需要把数据同步回VM，须实现DataProducer接口
-* 如果其需要产生一个事件，须实现EventEmitter接口
-
-~~~csharp
-using UnityEngine;
-using UnityEngine.UI;
-using System;
-
-namespace XUUI.UGUIAdapter
-{
-    public class InputFieldAdapter : AdapterBase<InputField>, DataConsumer<string>, DataProducer<string>
-    {
-
-        public Action<string> OnValueChange { get; set; } // InputField发生变化需要调用OnValueChange
-
-        public string Value // VM发生变化，会调用到该Setter，需要同步给InputField
-        {
-            set
-            {
-                Target.text = value;
-            }
-        }
-
-        void Start()
-        {
-            Target.onValueChange.AddListener((val) =>
-            {
-                if (OnValueChange != null)
-                {
-                    OnValueChange(val);
-                }
-            });
-        }
-    }
-}
-~~~
-
-### AdapterCollector
-
-提供一个lua模块，有一个collect方法，接受根UI节点，返回DataConsumer，DataProducer以及EventEmitter
-
-UGUI的实现是采用C#和lua相结合的办法。
-
-lua代码很简单，直接调用C#，然后把数组转成table
-
-~~~lua
-local _M = {}
-
-
-function _M.collect(go)
-    local infos = CS.XUUI.UGUIAdapter.Collector.Collect(go)
-    local r = {}
-    
-    for i = 0, infos.Length - 1 do
-        local objs = infos[i]
-        local t = {}
-        for j = 0, objs.Length - 1 do
-            table.insert(t, objs[j])
-        end
-        table.insert(r, t)
-    end
-    
-    return r
-end
-
-return _M
-~~~
-
-C#测也不复杂
-
-~~~csharp
-using UnityEngine;
-using System.Linq;
-
-namespace XUUI.UGUIAdapter
-{
-    public class Collector
-    {
-        // [0]: DataConsumers
-        // [1]: DataProducers
-        // [2]: EventEmitters
-        public static object[][] Collect(GameObject go)
-        {
-            var dataProducers = go.GetComponentsInChildren<InputFieldAdapter>(true)
-                .Select(o => (object)o)
-                .Concat(go.GetComponentsInChildren<DropdownAdapter>(true))
-                .ToArray();
-
-            var dataConsumers = go.GetComponentsInChildren<TextAdapter>(true)
-                .Select(o => (object)o)
-                .Concat(dataProducers)
-                .ToArray();
-
-            var eventEmitters = go.GetComponentsInChildren<ButtonAdapter>(true).Select(o => (object)o).ToArray();
-
-            return new object[][] { dataConsumers, dataProducers, eventEmitters };
-        }
-    }
-}
-~~~
+详细请看[《如何和任意UI库适配》](Docs/GuiAdapter.md)
 
