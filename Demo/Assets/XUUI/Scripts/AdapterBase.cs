@@ -1,17 +1,20 @@
 ﻿using UnityEngine;
 
-public class AdapterBase<T> : MonoBehaviour
+namespace XUUI
 {
-    public T Target;
-
-    [TextArea]
-    public string BindTo;
-
-    void Awake()
+    public class AdapterBase<T> : MonoBehaviour
     {
-        if (Target == null)
+        public T Target;
+
+        [TextArea]
+        public string BindTo;
+
+        void Awake()
         {
-            Target = gameObject.GetComponent<T>();
+            if (Target == null)
+            {
+                Target = gameObject.GetComponent<T>();
+            }
         }
     }
 }
