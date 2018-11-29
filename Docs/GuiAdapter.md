@@ -213,30 +213,31 @@ namespace XUUI.UGUIAdapter
 
 如果是思路2的Collect逻辑如下：
 ~~~csharp
-static object[][] Collect(BindToSetting setting)
+static object[][] collect(BindToSetting setting)
 {
 	var dataProducers = new List<object>();
+	var dataConsumers = new List<object>();
+	var eventEmitters = new List<object>();
 
 	if (setting.InputFields != null)
 	{
-		dataProducers.AddRange(setting.InputFields.Select(item => (object)new RawInputFieldAdapter(item.Target, item.BindTo)));
+		var adpaters = setting.InputFields.Select(item => (object)new RawInputFieldAdapter(item.Target, item.BindTo));
+		dataConsumers.AddRange(adpaters);
+		dataProducers.AddRange(adpaters);
+
 	}
 
 	if (setting.Dropdowns != null)
 	{
-		dataProducers.AddRange(setting.Dropdowns.Select(item => (object)new RawDropdownAdapter(item.Target, item.BindTo)));
+		var adpaters = setting.Dropdowns.Select(item => (object)new RawDropdownAdapter(item.Target, item.BindTo));
+		dataConsumers.AddRange(adpaters);
+		dataProducers.AddRange(adpaters);
 	}
-
-	var dataConsumers = new List<object>();
 
 	if (setting.Texts != null)
 	{
 		dataConsumers.AddRange(setting.Texts.Select(item => (object)new RawTextAdapter(item.Target, item.BindTo)));
 	}
-
-	dataConsumers.AddRange(dataProducers);
-
-	var eventEmitters = new List<object>();
 
 	if (setting.Buttons != null)
 	{
