@@ -188,17 +188,22 @@ namespace XUUI.UGUIAdapter
         // [2]: EventEmitters
         public static object[][] Collect(GameObject go)
         {
-            var dataProducers = go.GetComponentsInChildren<InputFieldAdapter>(true)
+            var adapters = go.GetComponentsInChildren<AdapterBase>(true);
+
+            var dataProducers = adapters
+                .Where(adapter => adapter is DataProducer)
                 .Select(o => (object)o)
-                .Concat(go.GetComponentsInChildren<DropdownAdapter>(true))
                 .ToArray();
 
-            var dataConsumers = go.GetComponentsInChildren<TextAdapter>(true)
+            var dataConsumers = adapters
+                .Where(adapter => adapter is DataConsumer)
                 .Select(o => (object)o)
-                .Concat(dataProducers)
                 .ToArray();
 
-            var eventEmitters = go.GetComponentsInChildren<ButtonAdapter>(true).Select(o => (object)o).ToArray();
+            var eventEmitters = adapters
+                .Where(adapter => adapter is EventEmitter)
+                .Select(o => (object)o)
+                .ToArray();
 
             return new object[][] { dataConsumers, dataProducers, eventEmitters };
         }

@@ -2,12 +2,15 @@
 
 namespace XUUI
 {
-    public class AdapterBase<T> : MonoBehaviour
+    public class AdapterBase : MonoBehaviour
     {
-        public T Target;
-
         [TextArea]
         public string BindTo;
+    }
+
+    public class AdapterBase<T> : AdapterBase
+    {
+        public T Target;
 
         void Awake()
         {
