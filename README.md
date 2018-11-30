@@ -88,7 +88,7 @@ Helloworld例子展现的是类似vue.js的能力，实际项目中，更建议�
 
 * Helloworld.unity: 快速入门的例子。
 * MoreComplex.unity: 演示混合使用lua，C#静态函数，C#成员函数作为事件响应，演示怎么监听一个数组的变化并应用到UI元素上。
-* NoLua.unity(Assets/XLua/Examples/03_UIEvent/): 演示不使用lua，把本框架作为一个mvvm驱动器，纯用C#写逻辑。
+* NoLua.unity: 演示不使用lua，把本框架作为一个mvvm驱动器，纯用C#写逻辑。
 * TestDetach.unity: 演示随意地挂载/卸载UI到一个ViewModel上。
 * App.unity: 演示应用框架怎么使用。
 
